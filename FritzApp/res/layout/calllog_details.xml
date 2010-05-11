@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_height="fill_parent"
+	android:background="@color/bg">
+	
+	<include android:id="@+id/title_bar" layout="@layout/t_titlebar" />
+	
+	<RelativeLayout>
+	
+		<RelativeLayout style="@style/FRITZListHeader" android:id="@+id/CallLogEntryHeader">
+			<ImageView android:id="@+id/TypeIcon" android:src="@drawable/call_outgoing"
+				android:layout_width="wrap_content" android:layout_marginLeft="10dip"
+				android:layout_marginRight="20dip" />
+			<TextView android:id="@+id/CallLogEntryName" style="@style/FRITZTextAppearanceBig"
+				android:layout_toRightOf="@id/TypeIcon" android:layout_width="wrap_content" />
+		<TextView android:id="@+id/CallLogEntryInfo"
+			android:layout_width="wrap_content" android:layout_alignParentRight="true"
+			android:layout_below="@id/CallLogEntryName" android:layout_toRightOf="@id/TypeIcon" />
+		</RelativeLayout>
+		
+		<LinearLayout android:orientation="vertical" android:id="@+id/Content"
+			android:layout_below="@id/CallLogEntryHeader" />
+			
+	</RelativeLayout>
+	
+</LinearLayout>

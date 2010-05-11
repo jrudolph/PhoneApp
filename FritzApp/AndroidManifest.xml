@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="de.avm.android.fritzapp" android:versionName="0.91" android:versionCode="91">
+	<application android:icon="@drawable/icon" android:label="@string/app_name"
+		android:theme="@style/FRITZTheme" android:debuggable="false">
+
+		<activity android:name="de.avm.android.fritzapp.gui.FRITZApp"
+			android:label="@string/app_name" android:launchMode="singleInstance" android:screenOrientation="nosensor">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity android:name=".gui.CallDetailsActivity"></activity>
+		<activity android:name=".gui.CallLogActivity" />
+		
+		<activity android:name=".gui.PhoneBookActivity"></activity>
+		<activity android:name=".gui.ContactDetailsActivity"></activity>
+		<activity android:name=".gui.WlanTesterActivity"></activity>
+		<activity android:name=".gui.SettingsActivity"></activity>
+		
+		<activity android:name=".gui.OpenWebActivity"></activity>
+        
+		<service android:name=".sipua.ui.RegisterService"></service>
+        <receiver android:enabled="true" android:name=".sipua.ui.Receiver">
+	      	<intent-filter>
+	        	<action android:name="android.intent.action.BOOT_COMPLETED" />
+	      	</intent-filter>
+	    </receiver>
+		<receiver android:name=".sipua.ui.Caller"></receiver>
+	    <receiver android:name=".sipua.ui.OneShotAlarm"/>
+	    <receiver android:name=".sipua.ui.OneShotAlarm2"/>
+	    <receiver android:name=".sipua.ui.LoopAlarm"/>
+
+
+<activity android:name=".sipua.ui.Activity2" android:label="@string/app_name" android:excludeFromRecents="true"></activity>
+<activity android:name=".sipua.ui.AutoAnswer" android:label="@string/app_name"></activity>
+<activity android:name=".sipua.ui.InCallScreen" android:excludeFromRecents="true" android:label="@string/app_name" android:screenOrientation="nosensor" android:launchMode="singleInstance"></activity>
+
+
+<activity android:name=".gui.FeaturesActivity"></activity>
+</application>
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
+
+
+<uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>
+<uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"></uses-permission>
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
+<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+<uses-permission android:name="android.permission.DISABLE_KEYGUARD"></uses-permission>
+<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"></uses-permission>
+<uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
+<uses-permission android:name="android.permission.WRITE_CONTACTS"></uses-permission>
+<uses-permission android:name="android.permission.WRITE_SETTINGS"></uses-permission>
+
+<supports-screens android:smallScreens="true" android:anyDensity="true"></supports-screens>
+</manifest> 

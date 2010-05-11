@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_height="fill_parent"
+	android:background="@color/bg">
+	<include android:id="@+id/HeaderArea" layout="@layout/t_titlebar" />
+	<include android:id="@+id/FooterArea" layout="@layout/t_footer"
+		android:layout_alignParentBottom="true"/>
+
+	<GridView android:id="@+id/DashBoard" android:numColumns="auto_fit"
+		android:verticalSpacing="0dp" android:horizontalSpacing="5dp"
+		android:columnWidth="85dp" android:stretchMode="columnWidth"
+		android:listSelector="@drawable/list_selector_background" android:gravity="center"
+		android:layout_marginTop="7dp" android:background="@color/bg"
+		android:layout_below="@id/HeaderArea" android:padding="0dip"/>
+
+    <include
+        layout="@layout/dtmf_twelve_key_dialer"
+        android:id="@+id/dtmf_dialer"
+        android:layout_height="263dip"
+        android:layout_above="@id/FooterArea"/>
+</RelativeLayout>

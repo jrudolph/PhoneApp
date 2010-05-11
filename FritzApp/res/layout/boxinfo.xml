@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_height="fill_parent"
+	android:background="@color/bg">
+	
+	<include android:id="@+id/HeaderArea" layout="@layout/t_titlebar" />
+	
+	<!-- Footer (muss wegen Referenz von DashBoard über diesem sein) -->
+	<!-- <include android:id="@+id/FooterArea" layout="@layout/t_footer"
+		android:layout_alignParentBottom="true"/> -->
+	
+	<!-- <LinearLayout android:orientation="vertical" android:layout_above="@id/FooterArea" --> 
+	<LinearLayout android:orientation="vertical"
+		android:layout_below="@id/HeaderArea"
+		android:layout_height="fill_parent" android:layout_width="fill_parent"
+		android:layout_weight="1">
+	    
+	    <ScrollView android:id="@+id/NoBoxinfoView"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:fillViewport="true">
+	        <TextView android:id="@+id/emptyText"
+	        	style="@style/FRITZTextAppearanceVeryBig"
+	            android:layout_width="fill_parent" android:layout_height="wrap_content"
+	            android:paddingLeft="10dip"
+	            android:paddingRight="10dip"
+	            android:paddingTop="10dip"
+	            android:lineSpacingMultiplier="0.92"
+	        android:text="@string/wlan_error_no_wlan_found" android:gravity="center"/>
+	    </ScrollView>
+	    
+	    <ScrollView android:id="@+id/BoxinfoView"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:fillViewport="true">
+	    	<LinearLayout android:orientation="vertical"
+	            android:layout_width="fill_parent"
+	    		android:layout_height="wrap_content"
+	    		android:padding="8dip">
+   				
+   				<TextView
+   					style="@style/FRITZTextAppearanceSmall"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"
+   					android:layout_marginBottom="2dip"
+   					android:text="@string/boxinfo_name"/>
+   				<TextView android:id="@+id/Name"
+   					style="@style/FRITZTextAppearanceVeryBig"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+   				
+   				<TextView
+   					style="@style/FRITZTextAppearanceSmall"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"
+   					android:layout_marginTop="8dip"
+   					android:layout_marginBottom="2dip"
+   					android:text="@string/boxinfo_version"/>
+   				<TextView android:id="@+id/Version"
+   					style="@style/FRITZTextAppearanceVeryBig"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+   				
+   				<TextView android:id="@+id/LabLabel"
+   					style="@style/FRITZTextAppearanceSmall"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"
+   					android:layout_marginTop="8dip"
+   					android:layout_marginBottom="2dip"
+   					android:text="@string/boxinfo_lab"/>
+   				<TextView android:id="@+id/Lab"
+   					style="@style/FRITZTextAppearanceVeryBig"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+   				
+   				<TextView
+   					style="@style/FRITZTextAppearanceSmall"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"
+   					android:layout_marginTop="8dip"
+   					android:layout_marginBottom="2dip"
+   					android:text="@string/boxinfo_address"/>
+   				<TextView android:id="@+id/Address"
+   					style="@style/FRITZTextAppearanceVeryBig"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+   				
+   				<TextView android:id="@+id/SsidLabel"
+   					style="@style/FRITZTextAppearanceSmall"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"
+   					android:layout_marginTop="8dip"
+   					android:layout_marginBottom="2dip"
+   					android:text="@string/boxinfo_ssid"/>
+   				<TextView android:id="@+id/Ssid"
+   					style="@style/FRITZTextAppearanceVeryBig"
+   					android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+		    </LinearLayout> 
+	    </ScrollView>
+	</LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/launch_button" style="@style/FRITZListItemLayout">
+	<ImageView android:id="@+id/launcher_button" android:src="@drawable/settings_icon"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_centerInParent="false"
+		android:scaleType="fitCenter"
+		android:tag="launcher" 
+		/>
+	<TextView android:id="@+id/launcher_text" android:text="default"
+		style="@style/FRITZTextAppearanceLauncherList" android:layout_width="wrap_content"
+		android:layout_marginLeft="74dip"
+		android:layout_marginTop="20dip" />
+	<ImageView android:id="@+id/launcher_arrow" android:src="@drawable/launcherlistitem_invoke"
+		android:layout_width="wrap_content" android:layout_marginTop="22dip"
+		android:layout_marginRight="2dip" android:tag="launcher"
+		android:layout_alignParentRight="true" />
+</RelativeLayout>

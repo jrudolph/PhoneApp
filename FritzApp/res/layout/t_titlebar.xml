@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/HeaderArea" android:background="@drawable/farbverlauf_oben">
+	
+	<ImageView android:id="@+id/fritzIcon" android:src="@drawable/fritzapp_icon"
+		android:layout_marginLeft="7dip" android:layout_width="wrap_content"/>
+
+	<ImageView android:id="@+id/apptitle" android:src="@drawable/fritzapp_header_name"
+		android:layout_marginLeft="67dip" android:layout_width="wrap_content"/>
+		
+	<LinearLayout android:id="@+id/Status"
+		android:orientation="vertical"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignParentRight="true" android:layout_marginRight="9dip"
+		android:visibility="gone">
+		
+		<TextView android:id="@+id/StatusSip" android:text="@string/status_sip"
+			android:gravity="bottom|center_horizontal"
+			style="@style/StatusDisplayTextDisabledAppearance"
+			android:background="@drawable/state_sip_disabled"/>
+		<TextView android:id="@+id/StatusBox" android:text="@string/status_box"
+			android:gravity="top|center_horizontal" android:paddingTop="1dip"
+			style="@style/StatusDisplayTextAppearance"
+			android:background="@drawable/state_box_away"/>
+		
+	</LinearLayout>
+		
+</RelativeLayout>

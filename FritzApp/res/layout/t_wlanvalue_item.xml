@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/FRITZListItemLayout">
+	<ImageView android:src="@android:drawable/divider_horizontal_bright"
+		android:id="@+id/divider" />
+
+	<TextView android:id="@+id/ValueName" style="@style/FRITZTextAppearanceBig"
+		android:layout_width="fill_parent" android:layout_below="@id/divider" />
+
+	<RelativeLayout android:id="@+id/ValueBarContainer"
+		android:layout_margin="5dip" android:orientation="vertical"
+		android:layout_width="180dip" android:background="@color/FRITZBlue"
+		android:layout_alignRight="@id/ValueName">
+
+		<!-- layout_width muss wrap_content sein, sonst kann man die Größe nicht dynamisch setzen. -->
+		<TextView android:id="@+id/ValueBar" android:layout_width="wrap_content"
+			android:background="@color/FRITZBlueDark" android:layout_alignLeft="@id/ValueBarContainer" />
+
+		<TextView android:id="@+id/Value" android:layout_alignLeft="@id/ValueBarContainer"
+			android:textColor="#FFFFFF" android:layout_width="wrap_content"
+			android:paddingLeft="3dip" />
+
+	</RelativeLayout>
+
+</RelativeLayout>

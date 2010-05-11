@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:background="@color/bg">
+
+	<include android:id="@+id/HeaderArea" layout="@layout/t_titlebar" />
+	<include android:id="@+id/FooterArea" layout="@layout/t_footer_incall"
+		android:layout_alignParentBottom="true"/>
+
+	<LinearLayout android:id="@+id/Display"
+		android:orientation="vertical"
+		android:layout_below="@id/HeaderArea"
+     	android:layout_width="fill_parent" android:layout_height="232dip"
+     	android:layout_marginTop="15dip"
+     	android:layout_marginLeft="5dip" android:layout_marginRight="5dip"
+     	android:background="@drawable/incall_background">
+     
+     	<TextView android:id="@+id/ActionLabel"
+     		android:layout_width="fill_parent" android:layout_height="wrap_content"
+     		android:layout_marginTop="0dip"
+     		android:layout_marginLeft="5dip" android:layout_marginRight="5dip"
+     		android:gravity="center_horizontal" android:singleLine="true"
+     		style="@style/FRITZTextAppearanceVeryBig"/>
+     		
+     	<Chronometer android:id="@+id/Duration"
+     		android:layout_width="fill_parent" android:layout_height="wrap_content"
+     		android:layout_marginTop="0dip"
+     		android:layout_marginLeft="5dip" android:layout_marginRight="5dip"
+     		android:visibility="gone"
+     		android:gravity="center_horizontal"
+     		style="@style/FRITZTextAppearanceVeryBig"/>
+     	
+     	<ImageView android:id="@+id/ActionImage"
+     		android:layout_width="fill_parent" android:layout_height="wrap_content"
+     		android:layout_marginTop="5dip"
+     		android:layout_gravity="center_horizontal"
+     		android:visibility="gone"/>
+     	
+     	<TextView android:id="@+id/Name"
+     		android:layout_width="fill_parent" android:layout_height="wrap_content"
+     		android:layout_marginTop="5dip"
+     		android:layout_marginLeft="5dip" android:layout_marginRight="5dip"
+     		android:gravity="center_horizontal" android:singleLine="true"
+     		style="@style/FRITZTextAppearanceVeryBig"/>
+     	
+     	<TextView android:id="@+id/Number"
+     		android:layout_width="fill_parent" android:layout_height="wrap_content"
+     		android:layout_marginTop="0dip"
+     		android:layout_marginLeft="5dip" android:layout_marginRight="5dip"
+     		android:gravity="center_horizontal" android:singleLine="true"
+     		style="@style/FRITZTextAppearanceIncall"/>
+	</LinearLayout>
+
+	<View android:id="@+id/Gap"
+		android:layout_width="fill_parent" android:layout_height="16dip"
+		android:layout_below="@id/Display"/>
+
+	<LinearLayout
+		android:id="@+id/Menu"
+		android:orientation="horizontal"
+		android:layout_below="@id/Gap"
+        android:layout_above="@id/FooterArea"
+     	android:layout_width="fill_parent" android:layout_height="94dip"
+     	android:background="@drawable/incall_menu_background">
+	</LinearLayout>
+
+    <include
+        layout="@layout/dtmf_twelve_key_dialer"
+        android:id="@+id/dtmf_dialer"
+        android:layout_height="263dip"
+        android:layout_above="@id/FooterArea"/>
+	
+</RelativeLayout>

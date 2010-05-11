@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_height="fill_parent"
+	android:background="@color/bg">
+	
+	<include android:id="@+id/title_bar" layout="@layout/t_titlebar" />
+	
+	<RelativeLayout style="@style/FRITZListHeader">
+		<TextView android:id="@+id/Name" android:gravity="left"
+			style="@style/FRITZTextAppearanceBig" android:layout_width="wrap_content"
+			android:padding="7dip" />
+		<ImageView android:id="@+id/FavoriteIcon"
+			android:layout_width="wrap_content" android:layout_alignParentRight="true"
+			android:layout_margin="4dip" />
+	</RelativeLayout>
+	
+	<ListView android:id="@+id/ContactNumbers" style="@style/FRITZListView"
+		android:layout_marginTop="8dip" android:layout_height="fill_parent" />
+		
+</LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/FRITZListItemLayout">
+	<ImageView android:id="@+id/TypeIcon" android:src="@drawable/call_outgoing"
+		android:layout_width="wrap_content" android:layout_centerVertical="true"
+		android:layout_marginLeft="10dip" android:layout_marginRight="20dip" />
+	<TextView android:id="@+id/CallLogEntryName" style="@style/FRITZTextAppearanceBig"
+		android:layout_toRightOf="@id/TypeIcon" android:layout_width="wrap_content" />
+	<TextView android:id="@+id/CallLogEntryNumber"
+		android:layout_width="wrap_content" android:layout_toRightOf="@id/TypeIcon"
+		android:layout_below="@id/CallLogEntryName" />
+	<TextView android:id="@+id/CallLogEntryInfo"
+		android:layout_width="wrap_content" android:layout_alignParentRight="true"
+		android:layout_below="@id/CallLogEntryName" />
+</RelativeLayout>

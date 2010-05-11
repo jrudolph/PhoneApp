@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_height="fill_parent"
+	android:background="@color/bg">
+	<include android:id="@+id/title_bar" layout="@layout/t_titlebar" />
+	
+	<TextView android:id="@+id/WLANInfo" android:text="@string/wlan_info" android:layout_marginLeft="5dip" />
+	
+	<LinearLayout android:id="@+id/WLANValues" android:orientation="vertical">
+		<ViewStub android:id="@+id/signalStub" android:inflatedId="@+id/signal"
+			android:layout="@layout/t_wlanvalue_item" />
+		<ViewStub android:id="@+id/bandwidthStub" android:inflatedId="@+id/bandwidth"
+			android:layout="@layout/t_wlanvalue_item" />
+	</LinearLayout>
+	
+	<ImageView android:src="@android:drawable/divider_horizontal_bright" />
+	<Button android:id="@+id/WLANStart" android:layout_width="wrap_content" android:layout_margin="10dip"
+		android:text="@string/aktualisieren" />
+		
+</LinearLayout>

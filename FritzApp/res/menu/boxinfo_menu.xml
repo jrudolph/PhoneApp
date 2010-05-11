@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/WebUI" android:title="@string/openweb_label"
+		android:icon="@android:drawable/ic_menu_view"></item>
+	<item android:id="@+id/About" android:title="@string/menu_about"
+		android:icon="@android:drawable/ic_menu_info_details"></item>
+	<item android:id="@+id/Help" android:title="@string/menu_help"
+		android:icon="@android:drawable/ic_menu_help"></item>
+</menu>

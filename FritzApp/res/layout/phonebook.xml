@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_height="fill_parent"
+	android:background="@color/bg">
+	<include android:id="@+id/title_bar" layout="@layout/t_titlebar" />
+	<ListView android:layout_height="fill_parent" style="@style/FRITZListView"
+		android:background="@color/bg" android:id="@+id/ListViewContent" />
+</LinearLayout>

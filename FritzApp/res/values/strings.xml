@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">FRITZ!App Fon</string>
+
+	<string name="start">Start</string>
+	<string name="aktualisieren">Aktualisieren</string>
+
+	<string name="wlan_info">Testen Sie die Qualität des WLANs.</string>
+	<string name="wlan_getting_data">Ermittle Daten...</string>
+	<string name="wlan_name_signal">Signalstärke</string>
+	<string name="wlan_name_bandwidth">Bandbreite</string>
+	<string name="wlan_name_signal_phone">Signal Phone</string>
+	<string name="wlan_error_no_wlan_found">Keine Daten vorhanden</string>
+
+	<string name="settings_label">Einstellungen</string>
+	<string name="settingssip_label">Anrufeinstellungen</string>
+	<string name="phonebook_label">Telefonbuch</string>
+	<string name="calllog_label">Anrufliste</string>
+	<string name="openweb_label">FRITZ!Box</string>
+	<string name="wlantester_label">WLAN-Verbindung</string>
+	<string name="features_label">Mehr</string>
+
+	<string name="connection_off">Nicht verbunden</string>
+	<string name="connection_on_with">Verbunden mit %s.</string>
+	<string name="connection_on">Verbunden.</string>
+	<string name="connection_start">Verbinden</string>
+	<string name="status_sip">Telefonie</string>
+	<string name="status_box">FRITZ!Box</string>
+
+	<string name="call_missed">In Abwesenheit</string>
+	<string name="call_incoming">Ankommend</string>
+	<string name="call_outgoing">Ausgehend</string>
+
+	<string name="button_callnow">Anrufen</string>
+	<string name="button_answer">Annehmen</string>
+	<string name="button_hangup">Beenden</string>
+
+	<string name="boxinfo_name">Name:</string>
+	<string name="boxinfo_version">Version:</string>
+	<string name="boxinfo_lab">Labor:</string>
+	<string name="boxinfo_address">Adresse:</string>
+	<string name="boxinfo_ssid">Verbundenes WLAN-Netzwerk:</string>
+
+	<string name="pref_cat_box">FRITZ!Box</string>
+	<string name="pref_boxpassword">FRITZ!Box-Kennwort</string>
+	<string name="pref_sippassword">Kennwort</string>
+	<string name="pref_address">Adresse</string>
+
+	<string name="problem_wlan_off">Es besteht keine WLAN-Verbindung zur FRITZ!Box.</string>
+	<string name="problem_wlan_disconnect">Es besteht keine WLAN-Verbindung zur FRITZ!Box.</string>
+	<string name="problem_fritzbox_missing">Es wurde keine FRITZ!Box gefunden.</string>
+	<string name="problem_fritzbox_rejected">Das FRITZ!Box-Kennwort wurde von der FRITZ!Box abgelehnt.</string>
+	<string name="problem_fritzbox_version">Die verwendete FRITZ!Box unterstützt kein FRITZ!App Fon.</string>
+	<string name="problem_connection_closed">Die Verbindung zur FRITZ!Box ist fehlgeschlagen.</string>
+
+	<string name="soap_tranfer_failed">Es konnten keine Daten geladen werden.</string>
+
+	<string name="call_log_today">Heute</string>
+	<string name="call_log_yesterday">Gestern</string>
+	<string name="call_log_call_now">Jetzt anrufen</string>
+	<string name="call_log_tab_all">Alle</string>
+
+	<string name="contact_number_home">Privat</string>
+	<string name="contact_number_work">Geschäftlich</string>
+	<string name="contact_number_mobile">Mobil</string>
+
+	<string name="contact_details_callX">%s anrufen</string>
+
+	<!-- for testing, see FRITZAppEMailExeptionHandler -->
+	<string name="error_mail_subject">Fehlerbericht FRITZ!App</string>
+	<string name="error_mail_address">user@somewhere.de</string>
+	<string name="error_mail_introduction">Bitte senden Sie den folgenden Fehlerbericht ab, damit wir die Anwendung verbessern können.</string>
+
+	<string name="pref_cat_sip">Telefoniegerät</string>
+	<string name="settings_sipuser">Benutzername</string>
+	<string name="settings_callroute">Andere Anwendungen</string>
+	<string name="settings_callroute2">Gespräche aus anderen Anwendungen übernehmen.</string>
+	<string name="settings_callroute_dialogtitle">Ausgehende Gespräche</string>
+    <string-array name="settings_callroute_optiontitles">
+        <item>Über FRITZ!Box</item>
+        <item>Über Mobilnetz</item>
+        <!-- <item>Nach Rückfrage</item> -->
+    </string-array>
+    <!-- see enum Sipdroid.Callroute -->
+    <string-array name="settings_callroute_options">
+        <item>BOX</item>
+        <item>FON</item>
+        <item>ASK</item>
+    </string-array>	
+	<string name="settings_sipringtone">Klingelton</string>
+	<string name="settings_sipringtone2">Setzt Klingelton für Gespräche, die über die FRITZ!Box eingehen.</string>
+	<string name="settings_sipringtone_dialog">Klingeltöne</string>
+    
+	<string name="menu_mute">Stumm</string>
+	<string name="menu_hold">Halten</string>
+	<string name="menu_transfer">Verbinden</string>
+	<string name="menu_speaker">Lautsprecher</string>
+	<string name="menu_exit">Beenden</string>
+	<string name="menu_about">Info</string>
+	<string name="menu_help">Hilfe</string>
+	<string name="menu_call">Anrufen</string>
+
+	<string name="card_title_in_progress">Aktiver Anruf</string>
+	<string name="card_title_on_hold">Gehalten</string>
+	<string name="transfer_title">Weiterverbinden mit</string>
+
+	<string name="auto_enabled">Autom. Rufannahme/Freisprechen</string>
+	<string name="auto_disabled">Automatische Rufannahme aus</string>
+
+	<string name="regno">Telefonie über FRITZ!Box inaktiv</string>
+	<string name="reg">Anmeldung läuft ...</string>
+	<string name="regok">Telefonie über FRITZ!Box aktiv</string>
+	<string name="regfailed">Anmeldung an FRITZ!Box gescheitert</string>
+
+	<string name="voicemail">neue Nachricht(en)</string>
+	<string name="dialpad_hint">Rufnummer</string>
+	<string name="dtmf_hint">Eingabe</string>
+	<string name="empty">Bitte die Rufnummer eingeben</string>
+	<string name="unknown">Unbekannt</string>
+	
+	<string name="callstate_hangup">Anruf beendet</string>
+	<string name="callstate_incoming">Einkommender Ruf</string>
+	<string name="callstate_dialing">Rufaufbau</string>
+	<string name="callstate_onhold">Ruf gehalten</string>
+	
+	<string name="callroute_fallback">%s\n\nAnrufen über Mobilnetz?</string>
+	<string name="yes">Ja</string>
+	<string name="no">Nein</string>
+
+	<string name="callroute_dialogtitle">Ausgehende Gespräche</string>
+    <string-array name="callroute_optiontitles">
+        <item>Über FRITZ!Box</item>
+        <item>Über Mobilnetz</item>
+    </string-array>
+    <!-- for values see string-array settings_callroute_options -->
+
+	<string name="about_text">FRITZ!App Fon für Android.
+\n
+\nAVM GmbH (http://www.avm.de).
+\n
+\nVersion ${VERSION}
+\n
+\nWeitere Informationen erhalten Sie durch Anfrage an info@avm.de mit dem Stichwort \"FRITZ!App Fon\".
+\n
+\nDiese Version des Programmes enthält u.a. Programmteile mit folgenden Vermerken:
+\n
+\nCopyright (C) 2009 AVM GmbH Berlin (http://avm.de)
+\nCopyright (C) 2009 The Sipdroid Open Source Project (http://sipdroid.org)
+\nCopyright (C) 2008 Hughes Systique Corporation, USA (http://hsc.com)
+\nCopyright (C) 2006 The Android Open Source Project (http://android.com)
+\nCopyright (C) 2005 Luca Veltri - University of Parma - Italy (http://mjsip.org)
+\nCopyright (C) 2003-2008 Benny Prijono (benny@prijono.org)
+\nCopyright (C) 2008-2009 Teluu Inc. (http://www.teluu.com)
+\n
+\nTeile dieser Version des Programm sind ggf. freie Software. Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren.
+\n</string>
+
+	<string name="intro_text">Und so verbinden Sie FRITZ!App mit Ihrer FRITZ!Box:
+\n
+\n1. Öffnen Sie die Benutzeroberfläche der FRITZ!Box und aktivieren Sie unter "Einstellungen" / "Erweiterte Einstellungen" / "System" / "Ansicht" die Expertenansicht. 
+\n
+\n2. Anschließend richten Sie unter "Erweiterte Einstellungen" / "Telefonie" / "Telefoniegeräte" ein neues Telefoniegerät ein. Wählen Sie auf der folgenden Seite "Telefon" und anschließend als Verbindungsart "LAN/WLAN" aus. Geben Sie nun ein Kennwort für das Telefon an. Sie bekommen die interne Nummer ("Benutzername") des IP-Telefons mitgeteilt, üblicherweise die "620". Klicken Sie auf weiter und nehmen nun das Handy zur Hand während die FRITZ!Box auf die Anmeldung wartet.
+\n
+\n3. Geben Sie in den Einstellungen der FRITZ!App ("Mehr" / "Einstellungen") unter "FRITZ!Box-Telefon" den zuvor von der FRITZ!Box mitgeteilten Benutzernamen (zum Beispiel "620") und das Kennwort für das IP-Telefon ein.
+\n
+\nNach dem alle Eingaben abgeschlossen sind, verbindet sich die FRITZ!App mit der FRITZ!Box, wann immer das Handy mit der FRITZ!Box über WLAN verbunden ist. Sie können nun über die FRITZ!Box intern wie extern über Festnetz und VoIP telefonieren.
+\n</string>
+
+</resources>

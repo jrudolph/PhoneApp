@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/FRITZListItemLayout">
+	<ImageView android:id="@+id/TypeIcon" android:src="@drawable/call_outgoing"
+		android:layout_width="wrap_content" android:layout_marginTop="5dip"
+		android:layout_marginLeft="5dip" android:layout_marginRight="15dip" />
+	<TextView android:id="@+id/ContactNumberType"
+		android:layout_width="wrap_content" android:layout_toRightOf="@id/TypeIcon"
+		style="@style/FRITZTextAppearanceBig" />
+	<TextView android:id="@+id/ContactNumber"
+		android:layout_below="@id/ContactNumberType" android:layout_alignLeft="@id/ContactNumberType"
+		android:layout_width="wrap_content" />
+</RelativeLayout>

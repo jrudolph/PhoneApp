@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@android:id/tabhost" android:layout_height="fill_parent"
+	android:background="@color/bg">
+	<LinearLayout android:orientation="vertical"
+		android:layout_height="fill_parent">
+		<include android:id="@+id/title_bar" layout="@layout/t_titlebar" />
+		<TabWidget android:id="@android:id/tabs" />
+		<FrameLayout android:id="@android:id/tabcontent"
+			android:layout_height="fill_parent">
+			<ListView android:layout_height="fill_parent" android:id="@+id/ListContentAll" style="@style/FRITZListView" />
+			<ListView android:layout_height="fill_parent" android:id="@+id/ListContent1" style="@style/FRITZListView"/>
+			<ListView android:layout_height="fill_parent" android:id="@+id/ListContent2" style="@style/FRITZListView"/>
+			<ListView android:layout_height="fill_parent" android:id="@+id/ListContent3" style="@style/FRITZListView"/>
+		</FrameLayout>
+	</LinearLayout>
+
+</TabHost>

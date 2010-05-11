@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="transparent">#00000000</color>
+	<color name="FRITZBlue">#3391E1</color>
+	<color name="FRITZBlueDark">#0069d7</color>
+	<color name="FRITZBlueText">#0056AF</color>
+    <color name="FRITZHeader">#0069d7</color>
+    <color name="FRITZHeaderLine">#0e4c88</color>
+    <color name="bg">#FFFFFF</color>
+    <color name="incall_textConnected">#40CEA3</color>
+    <color name="incall_textEnded">#FF6072</color>
+    <color name="incall_textOnHold">#FF9524</color>
+</resources>
