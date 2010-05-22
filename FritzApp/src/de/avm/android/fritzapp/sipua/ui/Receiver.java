@@ -21,20 +21,25 @@
 
 package de.avm.android.fritzapp.sipua.ui;
 
+import org.sipdroid.media.RtpStreamReceiver;
+
 import android.app.AlarmManager;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.net.NetworkInfo.DetailedState;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
@@ -45,14 +50,13 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
-
+import de.avm.android.fritzapp.GLOBAL;
 import de.avm.android.fritzapp.R;
 import de.avm.android.fritzapp.gui.FRITZApp;
-import de.avm.android.fritzapp.sipua.*;
+import de.avm.android.fritzapp.sipua.SipdroidEngine;
+import de.avm.android.fritzapp.sipua.UserAgent;
 import de.avm.android.fritzapp.sipua.phone.Call;
 import de.avm.android.fritzapp.sipua.phone.Connection;
-
-import org.sipdroid.media.RtpStreamReceiver;
 
 	public class Receiver extends BroadcastReceiver {
 
@@ -93,8 +97,9 @@ import org.sipdroid.media.RtpStreamReceiver;
 			if (mSipdroidEngine == null) {
 				mSipdroidEngine = new SipdroidEngine();
 				mSipdroidEngine.StartEngine();
-			} else
+			} /*else
 				mSipdroidEngine.CheckEngine();
+				*/
         	context.startService(new Intent(context,RegisterService.class));
 			return mSipdroidEngine;
 		}
@@ -391,21 +396,31 @@ import org.sipdroid.media.RtpStreamReceiver;
 
 		public static boolean on_wlan;
 		
-		public static boolean isFast() {
-        	WifiManager wm = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        	WifiInfo wi = wm.getConnectionInfo();
-
-        	if (wi != null) {
-        		if (!Sipdroid.release) Log.i("SipUA:","isFast() "+WifiInfo.getDetailedStateOf(wi.getSupplicantState())
-        				+" "+wi.getIpAddress());
-	        	if (wi.getIpAddress() != 0 && (WifiInfo.getDetailedStateOf(wi.getSupplicantState()) == DetailedState.OBTAINING_IPADDR
-	        			|| WifiInfo.getDetailedStateOf(wi.getSupplicantState()) == DetailedState.CONNECTED)) {
-	        		on_wlan = true;
-	        		return on_wlan;
+		public static boolean isFast()
+		{
+			if (GLOBAL.DEBUG_NO_COM_CHECK)
+			{
+				// pretend to connect over WLAN for debugging
+        		on_wlan = true;
+        		return on_wlan;
+			}
+			else
+			{
+	        	WifiManager wm = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+	        	WifiInfo wi = wm.getConnectionInfo();
+	
+	        	if (wi != null) {
+	        		if (!Sipdroid.release) Log.i("SipUA:","isFast() "+WifiInfo.getDetailedStateOf(wi.getSupplicantState())
+	        				+" "+wi.getIpAddress());
+		        	if (wi.getIpAddress() != 0 && (WifiInfo.getDetailedStateOf(wi.getSupplicantState()) == DetailedState.OBTAINING_IPADDR
+		        			|| WifiInfo.getDetailedStateOf(wi.getSupplicantState()) == DetailedState.CONNECTED)) {
+		        		on_wlan = true;
+		        		return on_wlan;
+		        	}
 	        	}
-        	}
-        	on_wlan = false;
-         	return isFast2();
+	        	on_wlan = false;
+	         	return isFast2();
+			}
 		}
 		
 		static boolean isFast2() {
@@ -419,10 +434,11 @@ import org.sipdroid.media.RtpStreamReceiver;
 	        if (!Sipdroid.on(context)) return;
         	if (!Sipdroid.release) Log.i("SipUA:",intentAction);
         	if (mContext == null) mContext = context;
+        	/*
 	        if (intentAction.equals(Intent.ACTION_BOOT_COMPLETED)){
-	            if(!engine(mContext).isRegistered()) // Fix NB/SH
+	            //if(!engine(mContext).isRegistered()) // Fix NB/SH
 	               engine(context).register();
-	        } else
+	        } else */
 	        if (intentAction.equals(ACTION_DATA_STATE_CHANGED)) {
 	            if(!engine(mContext).isRegistered()) // Fix NB/SH
 	               engine(context).register();

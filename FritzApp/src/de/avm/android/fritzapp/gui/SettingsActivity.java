@@ -36,6 +36,7 @@ package de.avm.android.fritzapp.gui;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -67,6 +68,7 @@ public class SettingsActivity extends PreferenceActivity implements
 {
 	private EditTextPreference mUrlPref = null;
 	private EditTextPreference mSipUserPref = null;
+	private EditTextPreference mSipPass = null;
 
 	/* (non-Javadoc)
 	 * @see android.preference.PreferenceActivity#onCreate(android.os.Bundle)
@@ -75,11 +77,11 @@ public class SettingsActivity extends PreferenceActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Rahmenview
+		// frame
 		LinearLayout view = (LinearLayout) View.inflate(this,
 				R.layout.settings, null);
 
-		// Liste für Preferences
+		// list
 		ListView preferenceView = new ListView(this);
 		preferenceView.setLayoutParams(new LayoutParams(
 				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
@@ -122,7 +124,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		group.setTitle(getString(R.string.pref_cat_box));
 		root.addPreference(group);
 		
-		// Adresse Box
+		// box address
 		mUrlPref = new EditTextPreference(this)
 		{
 			@Override
@@ -138,7 +140,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		mUrlPref.setSummary(DataHub.getFritzboxUrl(this));
 		group.addPreference(mUrlPref);
 
-		// Kennwort Box
+		// box password
 		final EditTextPreference passPref = new EditTextPreference(this)
 		{
 			@Override
@@ -160,7 +162,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		group.setTitle(R.string.pref_cat_sip);
 		root.addPreference(group);
 		
-		// Benutzer SIP
+		// SIP user
 		mSipUserPref = new EditTextPreference(this)
 		{
 			@Override
@@ -173,11 +175,12 @@ public class SettingsActivity extends PreferenceActivity implements
 		mSipUserPref.setKey(Sipdroid.PREF_SIPUSER);
 		mSipUserPref.setTitle(R.string.settings_sipuser);
 		mSipUserPref.setDialogTitle(R.string.settings_sipuser);
-		mSipUserPref.setSummary(Sipdroid.getSipUser());
+		mSipUserPref.setSummary(getPreferenceManager().getSharedPreferences()
+				.getString(Sipdroid.PREF_SIPUSER, ""));
 		group.addPreference(mSipUserPref);
 		
-		// Kennwort SIP
-		final EditTextPreference sipPass = new EditTextPreference(this)
+		// SIP password
+		mSipPass = new EditTextPreference(this)
 		{
 			@Override
 			protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
@@ -186,14 +189,17 @@ public class SettingsActivity extends PreferenceActivity implements
 				builder.setInverseBackgroundForced(true);
 			}
 		};
-		sipPass.setKey(Sipdroid.PREF_SIPPASS);
-		sipPass.setTitle(R.string.pref_sippassword);
-		sipPass.setDialogTitle(R.string.pref_sippassword);
-		sipPass.getEditText().setTransformationMethod(new PasswordTransformationMethod());
-		sipPass.getEditText().setRawInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		group.addPreference(sipPass);
+		mSipPass.setKey(Sipdroid.PREF_SIPPASS);
+		mSipPass.setTitle(R.string.pref_sippassword);
+		mSipPass.setDialogTitle(R.string.pref_sippassword);
+		mSipPass.getEditText().setTransformationMethod(new PasswordTransformationMethod());
+		mSipPass.getEditText().setRawInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		if (getPreferenceManager().getSharedPreferences()
+				.getString(Sipdroid.PREF_SIPPASS, "").length() < 1)
+			mSipPass.setSummary(R.string.pref_sippassword_empty);
+		group.addPreference(mSipPass);
 		
-		// Klingelton
+		// ringtone
 		SipRingtonePreference ringtonePref = new SipRingtonePreference(this);
 		ringtonePref.setKey(Sipdroid.PREF_RINGTONE);
 		ringtonePref.setTitle(R.string.settings_sipringtone);
@@ -201,8 +207,17 @@ public class SettingsActivity extends PreferenceActivity implements
 		ringtonePref.setRingtoneType(RingtoneManager.TYPE_RINGTONE);
 		ringtonePref.setPersistent(false);
 		group.addPreference(ringtonePref);
+
+		// exception list
+		final PreferenceScreen expPref =
+			getPreferenceManager().createPreferenceScreen(this); 
+		expPref.setTitle(R.string.settings_routeexceptions);
+		expPref.setIntent(new Intent(this,
+				de.avm.android.fritzapp.gui.SettingsRouteExceptionsActivity.class));
+		expPref.setSummary(R.string.settings_routeexceptions2);
+		group.addPreference(expPref);
 		
-		// bevorzugte Anrufart
+		// preferred call route
 		ListPreference listPref = new ListPreference(this); 
 		listPref.setKey(Sipdroid.PREF_CALLROUTE);
 		listPref.setDefaultValue(Sipdroid.PREF_CALLROUTE_DEFAULT.toString());
@@ -212,7 +227,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		listPref.setEntries(R.array.settings_callroute_optiontitles);
 		listPref.setEntryValues(R.array.settings_callroute_options);
 		group.addPreference(listPref);
-
+		
 		return root;
 	}
 
@@ -245,20 +260,37 @@ public class SettingsActivity extends PreferenceActivity implements
 
 		if (key.equals(Sipdroid.PREF_SIPUSER))
 		{
-			mSipUserPref.setSummary(Sipdroid.getSipUser());
+			mSipUserPref.setSummary(mSipUserPref.getText());
+	 	}
+
+		if (key.equals(Sipdroid.PREF_SIPPASS))
+		{
+			if (mSipPass.getText().length() > 0)
+				mSipPass.setSummary("");
+			else
+				mSipPass.setSummary(R.string.pref_sippassword_empty);
 	 	}
 	}
 	
 	/**
 	 * Preparations on settings to do on app's start
+	 * @param context context for reading and writing the settings
+	 * @param firstRun true for first run after install
 	 */
-	public static void prepareSettings(Context context)
+	public static void prepareSettings(Context context, boolean firstRun)
 	{
-		// we hide settings from user which where changeable before,
-		// so restore default values
 		Editor edit = PreferenceManager
 				.getDefaultSharedPreferences(context).edit();
 		
+		if (firstRun)
+		{
+			// default username for SIP
+			edit.putString(Sipdroid.PREF_SIPUSER, Sipdroid.PREF_SIPUSER_DEFAULT);
+		}
+		
+		// we hide settings from user which where changeable before,
+		// so restore default values
+
 		// "Rufannahme im Betrieb"
 		// "Bei eingeschaltetem Bildschirm mit kurzem Vibrationsalarm"
 		edit.putBoolean(Sipdroid.PREF_AUTOON, false);				
@@ -268,6 +300,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		edit.putBoolean(Sipdroid.PREF_AUTOONDEMAND, false);
 
 		edit.commit();
+		
+		SettingsRouteExceptionsActivity.prepareSettings(context, firstRun);
 	}
-	
 }

@@ -81,7 +81,9 @@ public class GLOBAL {
 					Enum.valueOf(ComSettingsChecker.CONNECTION_PROBLEM.class,
 							message.getData().getString(PARAM));
 
-				if (mStatus != null) mStatus.setConn(false, "");
+				if (mStatus != null)
+					mStatus.setConn((problem.isError()) ?
+							ComStatus.CONN_AWAY : ComStatus.CONN_NOTFOUND, "");
 
 				TextDialog.createOk(mContext,
 						ResourceHelper.getTextForConnectionProblem(problem,

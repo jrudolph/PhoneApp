@@ -185,7 +185,7 @@ public class DataHub implements IData
 		SharedPreferences mySharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(c);
 		String pass = mySharedPreferences.getString(
-				IData.PREF_PASS, "");
+				IData.PREF_PASS, IData.DEFAULT_PASS);
 		if (pass == null) {
 			return "";
 		}

@@ -3,7 +3,6 @@
  *                 The Apache Software License, Version 1.1
  * ============================================================================
  *
- * Copyright (C) 2010 AVM GmbH <info@avm.de>
  * Copyright (C) 2002 The Apache Software Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -48,7 +47,7 @@
  */
 package de.avm.android.fritzapp.com.discovery;
 
-/* BASED on UPNP by <sbbi.net>. Modified by usefulbits GmbH <usbi.de> */
+/* BASED on UPNP by <sbbi.net>. Modified by AVM GmbH <info@avm.de> */
 
 import java.io.IOException;
 import java.net.DatagramPacket;

@@ -22,6 +22,7 @@ public class PhoneNumberHelper
 	private static final String[] mCountries = new String[] { "DE", "AT", "CH", null };
 	private static final String[] mInternationalPrefix = new String[] { "49", "43", "41" };
 	private static final String mReplacement = "0";
+	private static final String VALID_CHAR = "+0123456789*#";
 	
 	/**
 	 * Stripps international dialing prefix with "+" for national calls in
@@ -44,5 +45,20 @@ public class PhoneNumberHelper
 				}
 		}
 		return number;
+	}
+	
+	/**
+	 * Strips invalid characters from phone number
+	 * @param number
+	 * @return
+	 */
+	public static String stripSeparators(String number)
+	{
+		StringBuilder builder = new StringBuilder(number.length());
+		char[] chars = number.toCharArray();
+		for(char ch : chars)
+			if (VALID_CHAR.indexOf(ch) >= 0)
+				builder.append(ch);
+		return builder.toString();
 	}
 }

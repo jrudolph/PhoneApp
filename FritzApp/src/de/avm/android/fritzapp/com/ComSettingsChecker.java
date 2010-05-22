@@ -103,8 +103,27 @@ public class ComSettingsChecker {
 		return mTr064Level;
 	}
 	
-	public static enum CONNECTION_PROBLEM {
-		WLAN_OFF, WLAN_DISCONNECT, FRITZBOX_MISSING, FRITZBOX_REJECTED, FRITZBOX_VERSION, NO_PROBLEM, CONNECTION_CLOSED
+	public static enum CONNECTION_PROBLEM
+	{
+		WLAN_OFF, WLAN_DISCONNECT, FRITZBOX_MISSING, FRITZBOX_REJECTED,
+		FRITZBOX_VERSION, NO_PROBLEM, CONNECTION_CLOSED;
+		
+		public boolean isError()
+		{
+			switch (this)
+			{
+				case NO_PROBLEM:
+					// OK
+					return false;
+
+				case WLAN_OFF:
+				case WLAN_DISCONNECT:
+				case FRITZBOX_MISSING:
+					// no connection but not an error
+					return false;
+			}
+			return true;
+		}
 	}
 
 	/**

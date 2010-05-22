@@ -26,10 +26,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
-import de.avm.android.fritzapp.R;
-import de.avm.android.fritzapp.sipua.ui.Receiver;
-import de.avm.android.fritzapp.sipua.ui.Sipdroid;
-
 import org.sipdroid.media.JAudioLauncher;
 import org.sipdroid.media.MediaLauncher;
 import org.zoolu.net.IpAddress;
@@ -52,7 +48,12 @@ import org.zoolu.tools.Log;
 import org.zoolu.tools.LogLevel;
 import org.zoolu.tools.Parser;
 
+import android.content.Context;
 import android.media.MediaPlayer;
+import android.telephony.TelephonyManager;
+import de.avm.android.fritzapp.R;
+import de.avm.android.fritzapp.sipua.ui.Receiver;
+import de.avm.android.fritzapp.sipua.ui.Sipdroid;
 
 /**
  * Simple SIP user agent (UA). It includes audio/video applications.
@@ -390,12 +391,11 @@ public class UserAgent extends CallListenerAdapter {
 	}
 
 	/** Launches the Media Application (currently, the RAT audio tool) */
-	protected void launchMediaApplication() {
+	protected boolean launchMediaApplication() {
 		// exit if the Media Application is already running
 		if (audio_app != null) {
-			printLog("DEBUG: media application is already running",
-					LogLevel.HIGH);
-			return;
+			printLog("DEBUG: media application is already running", LogLevel.HIGH);
+			return audio_app.mediaOk(false);
 		}
 		int avp = payload_type; //local_sdp must be set properly
 		
@@ -442,10 +442,8 @@ public class UserAgent extends CallListenerAdapter {
 		else if (user_profile.send_only)
 			dir = 1;
 
-		if (user_profile.audio && local_audio_port != 0
-				&& remote_audio_port != 0) { // create an audio_app and start
-												// it
-
+		// create an audio_app and start it
+		if (user_profile.audio && local_audio_port != 0	&& remote_audio_port != 0) {
 			if (audio_app == null) { // for testing..
 				String audio_in = null;
 				if (user_profile.send_tone) {
@@ -464,8 +462,9 @@ public class UserAgent extends CallListenerAdapter {
 						user_profile.audio_sample_size,
 						user_profile.audio_frame_size, log, avp, dtmf_pt);
 			}
-			audio_app.startMedia();
+			return audio_app.startMedia();
 		}
+		return !user_profile.audio;
 	}
 
 	/** Close the Media Application */
@@ -527,8 +526,14 @@ public class UserAgent extends CallListenerAdapter {
 		local_session = new_sdp.toString();
 	}
 
+	private boolean gsmBusy() {
+		TelephonyManager tm = (TelephonyManager)Receiver.mContext.getSystemService(Context.TELEPHONY_SERVICE);
+		int callState = tm.getCallState();
+		return (callState == TelephonyManager.CALL_STATE_RINGING) || (callState == TelephonyManager.CALL_STATE_OFFHOOK);
+	}
+	
 	// ********************** Call callback functions **********************
-
+	
 	/**
 	 * Callback function called when arriving a new INVITE method (incoming
 	 * call)
@@ -542,7 +547,8 @@ public class UserAgent extends CallListenerAdapter {
 			return;
 		}
 		printLog("INCOMING", LogLevel.HIGH);
-		if (!Receiver.isFast()) {
+		
+		if (!Receiver.isFast() || gsmBusy()) {
 			call.busy();
 			listen();
 			return;
@@ -558,8 +564,13 @@ public class UserAgent extends CallListenerAdapter {
 			SessionDescriptor remote_sdp = new SessionDescriptor(sdp);
 			createAnswer(remote_sdp, useGSM);
 		}
-		call.ring(local_session);		
-		launchMediaApplication();
+		call.ring(local_session);
+		if(!launchMediaApplication()) { // NB: signal 'busy' on audio initialization errors.
+			changeStatus(UA_STATE_IDLE,caller.toString());
+			call.busy();
+			listen();
+			return;
+		}
 	}
 
 	/**
@@ -606,7 +617,7 @@ public class UserAgent extends CallListenerAdapter {
 		printLog("RINGING", LogLevel.HIGH);
 		// Fix: on 183 we have to receive and play rtp data.
 		// Launching the media application at this early moment fixes the issue
-		// with eight seconds silence at the beginning of outgoing calls, too.
+		// with eight seconds silence at the beginning of outgoing calls, too. NB
 		if(code == 183) {
 			if (user_profile.no_offer) {
 				this.ring();
@@ -614,7 +625,11 @@ public class UserAgent extends CallListenerAdapter {
 			}
 			SessionDescriptor remote_sdp = new SessionDescriptor(sdp);
 			sessionProduct(remote_sdp);
-			launchMediaApplication();
+			if(!launchMediaApplication()) { // NB: hangup on audio initialization errors.
+				printLog("error initializing audio. hanging up.", LogLevel.HIGH);
+				call.hangup();
+				changeStatus(UA_STATE_IDLE);				
+			}
 		}
 		else if(code == 180)
 			this.ring();
@@ -647,7 +662,13 @@ public class UserAgent extends CallListenerAdapter {
 			// Update the local SDP along with offer/answer 
 			sessionProduct(remote_sdp);
 		}
-		launchMediaApplication();
+		
+		if(!launchMediaApplication()) { // NB: hangup on audio initialization errors.
+			printLog("error initializing audio. hanging up.", LogLevel.HIGH);
+			call.hangup();
+			changeStatus(UA_STATE_IDLE);
+			return;
+		}
 
 		if (call == call_transfer) 
 		{
@@ -749,7 +770,7 @@ public class UserAgent extends CallListenerAdapter {
 		if(cancel.hasHeader("Reason")) {
 			org.zoolu.sip.header.Header head = cancel.getHeader("Reason");
 			String val = head.getValue();
-			if(val.contains("SIP; cause=200; text=\"Call completed elsewhere\"")) // NB: other local telephone picked the call.
+			if(val != null && val.contains("SIP; cause=200; text=\"Call completed elsewhere\"")) // NB: other local telephone picked the call.
 				Receiver.ccCall.base = -1;
 		}
 		changeStatus(UA_STATE_IDLE);

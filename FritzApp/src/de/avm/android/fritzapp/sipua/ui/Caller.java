@@ -28,6 +28,7 @@ import de.avm.android.fritzapp.GLOBAL;
 import de.avm.android.fritzapp.R;
 import de.avm.android.fritzapp.gui.ComStatus;
 import de.avm.android.fritzapp.gui.Dialpad;
+import de.avm.android.fritzapp.util.CallRouteExceptions;
 import de.avm.android.fritzapp.util.PhoneNumberHelper;
 
 import android.content.ActivityNotFoundException;
@@ -81,7 +82,8 @@ public class Caller extends BroadcastReceiver
 		// (in mBlacklist)
         if (intentAction.equals(Intent.ACTION_NEW_OUTGOING_CALL) && (number != null) &&
         	!mBlacklist.test(intent.getStringExtra(EXTRA_ORIGINAL_URI)) &&
-        	!intent.getBooleanExtra(EXTRA_ALREADY_CALLED, false)) 
+        	!intent.getBooleanExtra(EXTRA_ALREADY_CALLED, false) &&
+        	!CallRouteExceptions.isException(context, number)) 
         {
         	if (!Sipdroid.release) Log.i("SipUA:","outgoing call");
 

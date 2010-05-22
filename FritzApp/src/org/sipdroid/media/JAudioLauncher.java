@@ -100,22 +100,57 @@ public class JAudioLauncher implements MediaLauncher
       catch (Exception e) {  printException(e,LogLevel.HIGH);  }
    }
 
+   /** Checks if audio engine works correctly */
+   public boolean mediaOk(boolean wait) {
+	   if(sender == null || receiver == null) {
+		   return false;
+	   }
+	   for(int i=0; i < (wait ? 4 : 0); i++) {
+		   if( (RtpStreamSender.RecordEngineState.STATE_NOTHING == sender.recordEngineInitialized()) ||
+			   (RtpStreamReceiver.AudioEngineState.STATE_NOTHING == receiver.audioEngineInitialized())) {
+			   try {
+				   android.util.Log.d("JAudioLauncher", "waiting for audio engine initialization...");
+				   Thread.sleep(250);
+			   }
+			   catch (InterruptedException e) {
+			   }
+		   }
+		   else
+			   break;
+	   }
+	   return (RtpStreamSender.RecordEngineState.STATE_INITIALIZED == sender.recordEngineInitialized() &&
+			   RtpStreamReceiver.AudioEngineState.STATE_INITIALIZED == receiver.audioEngineInitialized());
+   }
+   
    /** Starts media application */
    public boolean startMedia()
-   {  printLog("starting java audio..",LogLevel.HIGH);
+   {
+	   boolean ok = true;
+	   printLog("starting java audio..",LogLevel.HIGH);
 
-      if (sender!=null)
-      {  printLog("start sending",LogLevel.LOW);
-         sender.start();
-      }
-      if (receiver!=null)
-      {  printLog("start receiving",LogLevel.LOW);
-         receiver.start();
-      }
-      
-      return true;      
+	   if (sender!=null) {
+		   printLog("start sending",LogLevel.LOW);
+		   sender.start();
+	   }
+	   else
+		   ok = false;
+	   
+	   if (receiver!=null) {
+		   printLog("start receiving",LogLevel.LOW);
+		   receiver.start();
+	   }
+	   else {
+		   if(sender != null)
+			   sender.halt();
+		   ok = false;
+	   }
+	   
+	   if(!ok)
+		   return false;
+	   
+	   return mediaOk(true);
    }
-
+   
    /** Stops media application */
    public boolean stopMedia()
    {  printLog("halting java audio..",LogLevel.HIGH);    

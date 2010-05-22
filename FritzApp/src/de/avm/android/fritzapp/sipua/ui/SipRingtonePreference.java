@@ -29,6 +29,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
@@ -71,7 +72,7 @@ public class SipRingtonePreference extends RingtonePreference
     protected Uri onRestoreRingtone() 
     {
         String uriString = PreferenceManager.getDefaultSharedPreferences(mContext)
-        		.getString(Sipdroid.PREF_RINGTONE, "");
+        		.getString(Sipdroid.PREF_RINGTONE, Settings.System.DEFAULT_RINGTONE_URI.toString());
         return !TextUtils.isEmpty(uriString) ? Uri.parse(uriString) : null;        
     }    
 }

@@ -200,7 +200,7 @@ public class CallLogActivity extends TabActivity implements OfflineActivity {
 
 	public static Intent showIntent(Context context)
 	{
-		if (GLOBAL.mStatus.getConn() &&
+		if (GLOBAL.mStatus.isConn() &&
 			(GLOBAL.mStatus.getTr064Level() >= ComSettingsChecker.TR064_BASIC))
 		{
 			return new Intent(context, CallLogActivity.class);
@@ -213,7 +213,7 @@ public class CallLogActivity extends TabActivity implements OfflineActivity {
 	
 	public static Boolean canShow()
 	{
-		return GLOBAL.mStatus.getConn() &&
+		return GLOBAL.mStatus.isConn() &&
 			(GLOBAL.mStatus.getTr064Level() >= ComSettingsChecker.TR064_BASIC);
 	}
 }

@@ -24,13 +24,8 @@ package de.avm.android.fritzapp.sipua;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-
-import de.avm.android.fritzapp.GLOBAL;
-import de.avm.android.fritzapp.R;
-import de.avm.android.fritzapp.gui.ComStatus;
-import de.avm.android.fritzapp.sipua.ui.LoopAlarm;
-import de.avm.android.fritzapp.sipua.ui.Receiver;
-import de.avm.android.fritzapp.sipua.ui.Sipdroid;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.sipdroid.net.KeepAliveSip;
 import org.zoolu.net.IpAddress;
@@ -46,6 +41,12 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import de.avm.android.fritzapp.GLOBAL;
+import de.avm.android.fritzapp.R;
+import de.avm.android.fritzapp.gui.ComStatus;
+import de.avm.android.fritzapp.sipua.ui.LoopAlarm;
+import de.avm.android.fritzapp.sipua.ui.Receiver;
+import de.avm.android.fritzapp.sipua.ui.Sipdroid;
 
 public class SipdroidEngine implements RegisterAgentListener {
 
@@ -65,7 +66,14 @@ public class SipdroidEngine implements RegisterAgentListener {
 
 	private SipProvider sip_provider;
 	
+	private static final long REREGISTER_TIMEOUT = 15000; // 15s
+	private Timer reregister_timeout = null;
+	
 	static PowerManager.WakeLock wl;
+	
+	public void finalize() {
+		remove_reregister_timeout();
+	}
 	
 	public boolean StartEngine() {
 		try {
@@ -92,7 +100,9 @@ public class SipdroidEngine implements RegisterAgentListener {
 			SipStack.server_info = version;
 				
 			IpAddress.setLocalIpAddress();
+			
 			sip_provider = new SipProvider(IpAddress.localIpAddress, 0);
+			
 			user_profile.contact_url = user_profile.username
 				+ "@"
 				+ IpAddress.localIpAddress + (sip_provider.getPort() != 0?":"+sip_provider.getPort():"");
@@ -108,13 +118,11 @@ public class SipdroidEngine implements RegisterAgentListener {
 					+ user_profile.realm;
 			}
 
-			CheckEngine();
-			
 			ua = new UserAgent(sip_provider, user_profile);
 			ra = new RegisterAgent(sip_provider, user_profile.callerid, // modified
 					user_profile.contact_url, user_profile.username,
 					user_profile.realm, user_profile.passwd, this, user_profile);
-			ka = new KeepAliveSip(sip_provider,100000);
+			// ka = new KeepAliveSip(sip_provider,100000); // we don't need keep alives. NB
 
 			register();
 			listen();
@@ -160,10 +168,27 @@ public class SipdroidEngine implements RegisterAgentListener {
 		return ua.remote_media_address;
 	}
 	
+	private void remove_reregister_timeout() {
+		if(reregister_timeout != null) {
+			reregister_timeout.cancel();
+			reregister_timeout.purge();
+			reregister_timeout = null;
+		}
+	}
+	
 	public void expire() {
 		if (ra != null && ra.CurrentState == RegisterAgent.REGISTERED) {
-			ra.CurrentState = RegisterAgent.UNREGISTERED;
-			GLOBAL.mStatus.setSip(ComStatus.SIP_NOTREGISTERED, "");
+			remove_reregister_timeout();
+			reregister_timeout = new Timer();
+			reregister_timeout.schedule(new TimerTask() {
+				public void run() {
+					if (ra != null && ra.CurrentState == RegisterAgent.REGISTERED) {					
+						ra.CurrentState = RegisterAgent.UNREGISTERED;
+						GLOBAL.mStatus.setSip(ComStatus.SIP_NOTREGISTERED, "");
+						cancel();
+					}
+				}
+			}, REREGISTER_TIMEOUT);
 		}
 		register();
 	}
@@ -176,9 +201,10 @@ public class SipdroidEngine implements RegisterAgentListener {
 		}		
 	}
 	
-	public void register() {	
+	public void register() {
+		try {
 		if (user_profile == null || user_profile.username.equals("") ||
-				user_profile.realm.equals("")) return;
+				user_profile.realm.equals("") || user_profile.passwd.equals("")) return;
 		IpAddress.setLocalIpAddress();
 		user_profile.contact_url = user_profile.username
 			+ "@"
@@ -187,13 +213,17 @@ public class SipdroidEngine implements RegisterAgentListener {
 			unregister();
 		} else {
 			if (ra != null && ra.register()) {
-				GLOBAL.mStatus.setSip(ComStatus.SIP_IDLE, "");
+				if(reregister_timeout == null)
+					GLOBAL.mStatus.setSip(ComStatus.SIP_IDLE, "");
 				wl.acquire();
 			}
+		}
+		} catch (Exception ex) {
 		}
 	}
 
 	public void halt() { // modified
+		remove_reregister_timeout();
 		if (wl.isHeld())
 			wl.release();
 		if (ka != null) {
@@ -220,6 +250,7 @@ public class SipdroidEngine implements RegisterAgentListener {
 	
 	public void onUaRegistrationSuccess(RegisterAgent ra, NameAddress target,
 			NameAddress contact, String result) {
+		remove_reregister_timeout();		
 		if (isRegistered()) {
 			if (Receiver.on_wlan)
 				Receiver.alarm(60, LoopAlarm.class);
@@ -276,7 +307,6 @@ public class SipdroidEngine implements RegisterAgentListener {
 			return;
 		}
 		edit.commit();
-		setOutboundProxy();
 	}
 
 	/** Receives incoming calls (auto accept) */

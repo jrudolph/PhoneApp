@@ -26,6 +26,7 @@ import org.zoolu.sip.provider.SipStack;
 
 import de.avm.android.fritzapp.com.DataHub;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.preference.PreferenceManager;
@@ -171,8 +172,12 @@ public class Sipdroid
 
 	public static String getSipUser()
 	{
-		return PreferenceManager.getDefaultSharedPreferences(Receiver.mContext)
-				.getString(PREF_SIPUSER, PREF_SIPUSER_DEFAULT);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(Receiver.mContext); 
+		if (prefs.getString(Sipdroid.PREF_SIPPASS, "").length() > 0)
+			return prefs.getString(PREF_SIPUSER, ""); 
+		return ""; // no password -> do not register
+				
 	}
 	
 	public static float getMicGain() {

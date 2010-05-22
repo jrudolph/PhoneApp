@@ -20,6 +20,8 @@
 
 package de.avm.android.fritzapp.sipua.ui;
 
+import org.sipdroid.media.RtpStreamReceiver;
+
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -45,6 +47,7 @@ public class RegisterService extends Service {
     @Override
     public void onCreate() {
     	super.onCreate();
+    	if(Receiver.mContext == null) Receiver.mContext = this;
         if (m_receiver == null) {
 			 IntentFilter intentfilter = new IntentFilter();
 			 intentfilter.addAction(Receiver.ACTION_DATA_STATE_CHANGED);
@@ -60,6 +63,7 @@ public class RegisterService extends Service {
 	         registerReceiver(m_caller = new Caller(), intentfilter);      
         }
         Receiver.engine(this).isRegistered();
+        RtpStreamReceiver.restoreSettings();
     }
     
     @Override

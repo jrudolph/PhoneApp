@@ -174,14 +174,14 @@ public class WlanTesterActivity extends Activity implements OfflineActivity {
 
 	public static Intent showIntent(Context context)
 	{
-		return (GLOBAL.mStatus.getConn() &&
+		return (GLOBAL.mStatus.isConn() &&
 				(GLOBAL.mStatus.getTr064Level() >= ComSettingsChecker.TR064_BASIC)) ?
 				new Intent(context, WlanTesterActivity.class) : null;
 	}
 	
 	public static Boolean canShow()
 	{
-		return GLOBAL.mStatus.getConn() &&
+		return GLOBAL.mStatus.isConn() &&
 			(GLOBAL.mStatus.getTr064Level() >= ComSettingsChecker.TR064_BASIC);
 	}
 }

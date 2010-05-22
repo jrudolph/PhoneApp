@@ -32,6 +32,10 @@ public class ComStatus
 {
 	private static final String TAG = "ComStatus";
 	
+	public static final int CONN_NOTFOUND = 0;
+	public static final int CONN_AWAY = 1;
+	public static final int CONN_AVAILABLE = 2;
+	
 	public static final int SIP_NOTREGISTERED = 0;
 	public static final int SIP_AWAY = 1;
 	public static final int SIP_IDLE = 2;
@@ -46,7 +50,7 @@ public class ComStatus
 	private Notification mNotification = null;
 
 	// for info and TR-064
-	private boolean mConnState = false;
+	private int mConnState = CONN_NOTFOUND;
 //	private String mHost = "";
 	private int mTr064Level = ComSettingsChecker.TR064_NONE;
 	
@@ -63,7 +67,7 @@ public class ComStatus
 	public synchronized Bundle getAsBundle()
 	{
 		Bundle bundle = new Bundle();
-		bundle.putBoolean("ConnState", mConnState);
+		bundle.putInt("ConnState", mConnState);
 //		bundle.putString("Host", mHost);
 		bundle.putInt("Tr064Level", mTr064Level);
 		return bundle;
@@ -73,7 +77,7 @@ public class ComStatus
 	{
 		if (bundle != null)
 		{
-			mConnState = bundle.getBoolean("ConnState", false);
+			mConnState = bundle.getInt("ConnState", CONN_NOTFOUND);
 //			mHost = bundle.getString("Host");
 			mTr064Level = bundle.getInt("Tr064Level", ComSettingsChecker.TR064_NONE);
 			update();
@@ -83,7 +87,7 @@ public class ComStatus
 	
 	public synchronized void clear()
 	{
-		mConnState = false;
+		mConnState = CONN_NOTFOUND;
 		mTr064Level = ComSettingsChecker.TR064_NONE;
 		mSipState = SIP_NOTREGISTERED;
 		update();
@@ -92,29 +96,39 @@ public class ComStatus
 	
 	public synchronized boolean isConnected()
 	{
-		return mConnState || (mSipState == SIP_AVAILABLE);
+		return (mConnState == CONN_AVAILABLE) || (mSipState == SIP_AVAILABLE);
 	}
 	
 	/**
-	 * @return true if box has been found recently
+	 * @return box' connection status
 	 */
-	public boolean getConn()
+	public int getConn()
 	{
 		return mConnState;
 	}
 	
 	/**
-	 * @return true if box has been found recently
+	 * @return true if box has been connected recently
 	 */
-	public synchronized void setConn(boolean isConnected, String host)
+	public boolean isConn()
 	{
-		if ((mConnState != isConnected) /*|| !mHost.equalsIgnoreCase(host)*/)
+		return mConnState == CONN_AVAILABLE;
+	}
+	
+	/**
+	 * Sets box' connection status
+	 * @param conn box' connection status
+	 * @param host box connected
+	 */
+	public synchronized void setConn(int conn, String host)
+	{
+		if ((mConnState != conn) /*|| !mHost.equalsIgnoreCase(host)*/)
 		{
 			Log.d(TAG, String.format("new conn state: %s (%s)",
-					Boolean.toString(isConnected), host));
-			mConnState = isConnected;
+					Integer.toString(conn), host));
+			mConnState = conn;
 //			mHost = host;
-			if (!isConnected)
+			if (conn != CONN_AVAILABLE)
 			{
 				mTr064Level = ComSettingsChecker.TR064_NONE;
 //				mHost = "";

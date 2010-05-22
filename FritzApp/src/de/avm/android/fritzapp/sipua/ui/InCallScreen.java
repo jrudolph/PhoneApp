@@ -297,7 +297,7 @@ public class InCallScreen extends CallScreen
 			public void onClick(View v)
 			{
 				Receiver.engine(InCallScreen.this)
-						.speaker((RtpStreamReceiver.speakermode == AudioManager.MODE_NORMAL) ?
+						.speaker((RtpStreamReceiver.getSpeakermode() == AudioManager.MODE_NORMAL) ?
 								AudioManager.MODE_IN_CALL : AudioManager.MODE_NORMAL);
                 updateSpeakerButton();
 			}
@@ -588,7 +588,7 @@ public class InCallScreen extends CallScreen
 
 	private void updateSpeakerButton()
 	{
-		mSpeaker.setImageResource((RtpStreamReceiver.speakermode == AudioManager.MODE_NORMAL) ?
+		mSpeaker.setImageResource((RtpStreamReceiver.getSpeakermode() == AudioManager.MODE_NORMAL) ?
 				R.drawable.btn_speakeroff : R.drawable.btn_speaker);
 	}
 	

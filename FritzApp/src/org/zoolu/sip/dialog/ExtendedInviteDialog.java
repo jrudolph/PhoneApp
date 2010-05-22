@@ -73,7 +73,7 @@ public class ExtendedInviteDialog extends org.zoolu.sip.dialog.InviteDialog {
 
 	/** Number of authentication attempts. */
 	int attempts;
-
+	
 	/** Creates a new ExtendedInviteDialog. */
 	public ExtendedInviteDialog(SipProvider provider,
 			ExtendedInviteDialogListener listener) {
@@ -275,16 +275,18 @@ public class ExtendedInviteDialog extends org.zoolu.sip.dialog.InviteDialog {
 				ah = digest.getProxyAuthorizationHeader();
 			req.setAuthorizationHeader(ah);
 			transactions.remove(tc.getTransactionId());
-			
+
 			// FIX: no invite retransmit here: a new branch parameter is necessary. NB
-			org.zoolu.sip.header.ViaHeader via = req.getViaHeader();
-			String newBranch = SipProvider.pickBranch();
-			via.setBranch(newBranch);
-			req.removeViaHeader();
-			req.addViaHeader(via);
-			// NB
-			
-			tc = new TransactionClient(sip_provider, req, this);
+			if(req.hasViaHeader()) {
+				String newBranch = null;
+				org.zoolu.sip.header.ViaHeader via = req.getViaHeader();
+				newBranch = SipProvider.pickBranch();
+				via.setBranch(newBranch);
+				req.removeViaHeader();
+				req.addViaHeader(via);
+			} // NB
+
+			tc = new InviteTransactionClient(sip_provider, req, this);
 			transactions.put(tc.getTransactionId(), tc);
 			InviteDialog.last_invite_req = req; // Fix: safe original branch for later CANCEL request. NB
 			tc.request();

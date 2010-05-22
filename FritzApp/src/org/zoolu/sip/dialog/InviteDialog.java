@@ -70,6 +70,10 @@ public class InviteDialog extends Dialog implements TransactionClientListener,
 	/** Whether offer/answer are in INVITE/200_OK */
 	boolean invite_offer;
 
+	private boolean invited;
+	private boolean provisional;
+	private boolean cancelled_too_early;
+	
 	protected static final int D_INIT = 0;
 	protected static final int D_WAITING = 1;
 	protected static final int D_INVITING = 2;
@@ -186,6 +190,9 @@ public class InviteDialog extends Dialog implements TransactionClientListener,
 		this.invite_req = null;
 		this.ack_req = null;
 		this.invite_offer = true;
+		this.invited = false;
+		this.cancelled_too_early = false;
+		this.provisional = false;
 		changeStatus(D_INIT);
 	}
 
@@ -257,6 +264,8 @@ public class InviteDialog extends Dialog implements TransactionClientListener,
 		update(Dialog.UAC, invite_req);
 		InviteTransactionClient invite_tc = new InviteTransactionClient(
 				sip_provider, invite_req, this);
+		provisional = false;
+		invited = true;
 		invite_tc.request();
 	}
 
@@ -537,6 +546,18 @@ public class InviteDialog extends Dialog implements TransactionClientListener,
 		}
 	}
 
+	// NB: we have to prevent cancel requests when there is no authorized invite transaction pending.
+	// Instead we send cancel requests belated after receiving the provisional response.
+	public boolean provisional_cancel() {
+		provisional = true;
+		if(cancelled_too_early) {
+			cancelled_too_early = false;
+			cancel();
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Cancel the ongoing call request or a call listening. This method should
 	 * be called when the InviteDialog is in D_INVITING or D_ReINVITING state or
@@ -545,9 +566,15 @@ public class InviteDialog extends Dialog implements TransactionClientListener,
 	public void cancel() {
 		printLog("inside cancel()", LogLevel.MEDIUM);
 		if (statusIs(D_INVITING) || statusIs(D_ReINVITING)) {
+			if(invited && !provisional) {
+				cancelled_too_early = true;
+				return;
+			}
+			cancelled_too_early = false;
 			Message cancel = MessageFactory.createCancelRequest(last_invite_req, this); // modified // NB: invite_req
 			cancel(cancel);
 		} else if (statusIs(D_WAITING) || statusIs(D_ReWAITING)) {
+			cancelled_too_early = false;
 			invite_ts.terminate(); // NB: that's the reason why we send no "486 busy here" on incoming INVITE when we have an active call.
 		}
 	}
@@ -904,7 +931,7 @@ public class InviteDialog extends Dialog implements TransactionClientListener,
 		changeStatus(D_CLOSE);
 		listener.onDlgClose(this);
 	}
-
+	
 	// **************************** Logs ****************************/
 
 	/** Adds a new string to the default Log */

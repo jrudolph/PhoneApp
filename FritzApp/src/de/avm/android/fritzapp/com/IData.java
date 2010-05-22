@@ -23,6 +23,7 @@ public interface IData {
 	public final String PREF_SITE = "fritzappURL";
 	public final String PREF_PASS = "fritzappENC";
 	public final String DEFAULT_SITE = "http://fritz.box";
+	public final String DEFAULT_PASS = "0000";
 
 	/**
 	 * Gets the phone book list from the fritzbox.

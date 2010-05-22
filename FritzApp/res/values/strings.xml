@@ -20,9 +20,8 @@
 	<string name="wlantester_label">WLAN-Verbindung</string>
 	<string name="features_label">Mehr</string>
 
-	<string name="connection_off">Nicht verbunden</string>
-	<string name="connection_on_with">Verbunden mit %s.</string>
-	<string name="connection_on">Verbunden.</string>
+	<!--  <string name="connection_on_with">Verbunden mit %s.</string> -->
+	<string name="connection_on">Verbunden mit FRITZ!Box</string>
 	<string name="connection_start">Verbinden</string>
 	<string name="status_sip">Telefonie</string>
 	<string name="status_box">FRITZ!Box</string>
@@ -44,10 +43,11 @@
 	<string name="pref_cat_box">FRITZ!Box</string>
 	<string name="pref_boxpassword">FRITZ!Box-Kennwort</string>
 	<string name="pref_sippassword">Kennwort</string>
+	<string name="pref_sippassword_empty">Kein Kennwort eingerichtet!</string>
 	<string name="pref_address">Adresse</string>
 
 	<string name="problem_wlan_off">Es besteht keine WLAN-Verbindung zur FRITZ!Box.</string>
-	<string name="problem_wlan_disconnect">Es besteht keine WLAN-Verbindung zur FRITZ!Box.</string>
+	<string name="problem_wlan_disconnect">Es besteht keine Verbindung zur FRITZ!Box.</string>
 	<string name="problem_fritzbox_missing">Es wurde keine FRITZ!Box gefunden.</string>
 	<string name="problem_fritzbox_rejected">Das FRITZ!Box-Kennwort wurde von der FRITZ!Box abgelehnt.</string>
 	<string name="problem_fritzbox_version">Die verwendete FRITZ!Box unterstützt kein FRITZ!App Fon.</string>
@@ -74,7 +74,7 @@
 	<string name="pref_cat_sip">Telefoniegerät</string>
 	<string name="settings_sipuser">Benutzername</string>
 	<string name="settings_callroute">Andere Anwendungen</string>
-	<string name="settings_callroute2">Gespräche aus anderen Anwendungen übernehmen.</string>
+	<string name="settings_callroute2">Gespräche aus anderen Anwendungen übernehmen</string>
 	<string name="settings_callroute_dialogtitle">Ausgehende Gespräche</string>
     <string-array name="settings_callroute_optiontitles">
         <item>Über FRITZ!Box</item>
@@ -88,8 +88,13 @@
         <item>ASK</item>
     </string-array>	
 	<string name="settings_sipringtone">Klingelton</string>
-	<string name="settings_sipringtone2">Setzt Klingelton für Gespräche, die über die FRITZ!Box eingehen.</string>
+	<string name="settings_sipringtone2">Klingelton für Gespräche, die über die FRITZ!Box eingehen</string>
 	<string name="settings_sipringtone_dialog">Klingeltöne</string>
+	<string name="settings_routeexceptions">Ausnahmen</string>
+	<string name="settings_routeexceptions2">Immer über das Mobilnetz gewählte Rufnummern/Bereiche</string>
+	<string name="settings_addrouteexception">Ausnahme hinzufügen</string>
+	<string name="settings_editrouteexception">Ausnahme ändern</string>
+	<string name="settings_removerouteexception">Ausnahme entfernen</string>
     
 	<string name="menu_mute">Stumm</string>
 	<string name="menu_hold">Halten</string>
@@ -123,7 +128,7 @@
 	<string name="callstate_dialing">Rufaufbau</string>
 	<string name="callstate_onhold">Ruf gehalten</string>
 	
-	<string name="callroute_fallback">%s\n\nAnrufen über Mobilnetz?</string>
+	<string name="callroute_fallback">%s\n\nSoll das Gespräch über das Mobilnetz aufgebaut werden?</string>
 	<string name="yes">Ja</string>
 	<string name="no">Nein</string>
 
@@ -134,9 +139,12 @@
     </string-array>
     <!-- for values see string-array settings_callroute_options -->
 
-	<string name="about_text">FRITZ!App Fon für Android.
+	<string name="removeall">Alle entfernen</string>
+	<string name="ask_removeall">Sollen alle Einträge entfernt werden?</string>
+
+	<string name="about_text">FRITZ!App Fon
 \n
-\nAVM GmbH (http://www.avm.de).
+\nAVM GmbH (http://www.avm.de)
 \n
 \nVersion ${VERSION}
 \n
@@ -144,7 +152,7 @@
 \n
 \nDiese Version des Programmes enthält u.a. Programmteile mit folgenden Vermerken:
 \n
-\nCopyright (C) 2009 AVM GmbH Berlin (http://avm.de)
+\nCopyright (C) 2010 AVM GmbH Berlin (http://avm.de)
 \nCopyright (C) 2009 The Sipdroid Open Source Project (http://sipdroid.org)
 \nCopyright (C) 2008 Hughes Systique Corporation, USA (http://hsc.com)
 \nCopyright (C) 2006 The Android Open Source Project (http://android.com)
@@ -155,15 +163,19 @@
 \nTeile dieser Version des Programm sind ggf. freie Software. Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren.
 \n</string>
 
-	<string name="intro_text">Und so verbinden Sie FRITZ!App mit Ihrer FRITZ!Box:
+	<string name="intro_text">So verbinden Sie FRITZ!App Fon mit Ihrer FRITZ!Box:
 \n
-\n1. Öffnen Sie die Benutzeroberfläche der FRITZ!Box und aktivieren Sie unter "Einstellungen" / "Erweiterte Einstellungen" / "System" / "Ansicht" die Expertenansicht. 
+\n1. Öffnen Sie die Benutzeroberfläche der FRITZ!Box. Wählen Sie "Einstellungen / Erweiterte Einstellungen / System / Ansicht". Aktivieren Sie die Expertenansicht und klicken Sie auf "Übernehmen". 
 \n
-\n2. Anschließend richten Sie unter "Erweiterte Einstellungen" / "Telefonie" / "Telefoniegeräte" ein neues Telefoniegerät ein. Wählen Sie auf der folgenden Seite "Telefon" und anschließend als Verbindungsart "LAN/WLAN" aus. Geben Sie nun ein Kennwort für das Telefon an. Sie bekommen die interne Nummer ("Benutzername") des IP-Telefons mitgeteilt, üblicherweise die "620". Klicken Sie auf weiter und nehmen nun das Handy zur Hand während die FRITZ!Box auf die Anmeldung wartet.
+\n2. Wählen Sie "Erweiterte Einstellungen / Telefonie / Telefoniegeräte". Klicken Sie auf "Neues Gerät einrichten". Wählen Sie auf den folgenden Seiten die Geräteart "Telefon" und die Anschlussart "LAN/WLAN (IP-Telefon)". Auf der Seite "Einstellungen im IP-Telefon" wird Ihnen ein Benutzername angezeigt (z.B. 620). Geben Sie darunter ein Kennwort ein und bestätigen Sie das Kennwort. Merken Sie sich den Benutzernamen und das Kennwort für das IP-Telefon und klicken Sie auf "Weiter".
 \n
-\n3. Geben Sie in den Einstellungen der FRITZ!App ("Mehr" / "Einstellungen") unter "FRITZ!Box-Telefon" den zuvor von der FRITZ!Box mitgeteilten Benutzernamen (zum Beispiel "620") und das Kennwort für das IP-Telefon ein.
+\nDie FRITZ!Box wartet nun auf die Anmeldung des Mobiltelefons.
 \n
-\nNach dem alle Eingaben abgeschlossen sind, verbindet sich die FRITZ!App mit der FRITZ!Box, wann immer das Handy mit der FRITZ!Box über WLAN verbunden ist. Sie können nun über die FRITZ!Box intern wie extern über Festnetz und VoIP telefonieren.
+\n3. Nehmen Sie das Mobiltelefon zur Hand. Starten Sie FRITZ!App Fon und wählen Sie "Mehr / Einstellungen". Geben Sie unter "Telefoniegerät" den Benutzernamen und das Kennwort für das IP-Telefon ein. Das IP-Telefon wird an der FRITZ!Box angemeldet. Anschließend legen Sie in der Benutzeroberfläche der FRITZ!Box noch die Rufnummern für ausgehende und ankommende Gespräche fest.
+\n
+\nFRITZ!App Fon verbindet sich jetzt immer dann mit der FRITZ!Box, wenn das Mobiltelefon über WLAN mit der FRITZ!Box verbunden ist.
+\n
+\nNun können Sie mit dem Mobiltelefon über die FRITZ!Box extern und intern telefonieren.
 \n</string>
 
 </resources>

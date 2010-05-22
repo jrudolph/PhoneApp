@@ -229,7 +229,7 @@ public class Log {
 	 * <i>verbose_level</i>
 	 */
 	public Log print(String message, int level) {
-		if (do_log && level <= verbose_level) {
+		if (do_log && level <= verbose_level && (message != null)) {
 			if (log_tag != null)
 				out_stream.print(log_tag + ": " + message);
 			else

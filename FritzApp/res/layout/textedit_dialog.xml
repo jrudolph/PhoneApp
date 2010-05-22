@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/LayoutRoot"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:padding="8dip">
+
+	<EditText android:id="@+id/message"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:textSize="14dip" android:textColor="@color/FRITZBlueText"
+		android:singleLine="true" />
+
+</LinearLayout>

@@ -292,8 +292,11 @@ public class Call implements InviteDialogListener {
 		if (sdp != null && sdp.length() != 0)
 			remote_sdp = sdp;
 		if (code == 180 || code == 183) { // Fix: 183 means "ringing", too. NB
-			if (listener != null)
-				listener.onCallRinging(this, msg, code, sdp);
+
+			if(!dialog.provisional_cancel()) {
+				if (listener != null)
+					listener.onCallRinging(this, msg, code, sdp);
+			}
 		}
 	}
 

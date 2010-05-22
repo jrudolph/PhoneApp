@@ -54,6 +54,7 @@ import de.avm.android.fritzapp.sipua.ui.Caller;
 import de.avm.android.fritzapp.sipua.ui.Receiver;
 import de.avm.android.fritzapp.sipua.ui.RegisterService;
 import de.avm.android.fritzapp.sipua.ui.Sipdroid;
+import de.avm.android.fritzapp.util.CallRouteExceptions;
 import de.avm.android.fritzapp.util.PhoneNumberHelper;
 import de.avm.android.fritzapp.util.ResourceHelper;
 
@@ -87,7 +88,15 @@ public class FRITZApp extends Activity
 		setContentView(R.layout.main);
 
 		// manage settings
-		SettingsActivity.prepareSettings(this);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this); 
+		boolean isFirstRun = prefs.getBoolean(PREF_FIRSTRUN, true);
+		if (isFirstRun)
+		{
+			Editor edit = prefs.edit();
+			edit.putBoolean(PREF_FIRSTRUN, false);
+			edit.commit();
+		}
+		SettingsActivity.prepareSettings(this, isFirstRun);
 		
 		GridView grid = (GridView) findViewById(R.id.DashBoard);
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -161,6 +170,7 @@ public class FRITZApp extends Activity
 			mDialpad.setText(savedInstanceState.getString(DIALPAD_INPUT));
 		mDialpad.setInitiallyOpen(true);
 		final ImageButton btnDialpad = ((ImageButton)findViewById(R.id.SlideDialpad));
+		btnDialpad.setImageResource(R.drawable.btn_dialpadclose);
 		mDialpad.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener()
 		{
 			public void onDrawerClosed()
@@ -200,13 +210,8 @@ public class FRITZApp extends Activity
 		});
 		
 		// call once after install
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this); 
-		if (prefs.getBoolean(PREF_FIRSTRUN, true))
+		if (isFirstRun)
 		{
-			Editor edit = prefs.edit();
-			edit.putBoolean(PREF_FIRSTRUN, false);
-			edit.commit();
-			
 			// show introduction
 			showHelp(this);
 		}
@@ -354,7 +359,8 @@ public class FRITZApp extends Activity
 		GLOBAL.mWifiSleepPolicy = -1;
 		if (GLOBAL.mConnectivityChangeReceiver != null)
 		{
-			GLOBAL.mConnectivityChangeReceiver.Unregister();
+			try { GLOBAL.mConnectivityChangeReceiver.Unregister(); }
+			catch(Exception exp) { }
 			GLOBAL.mConnectivityChangeReceiver = null;
 		}
 	}
@@ -385,14 +391,19 @@ public class FRITZApp extends Activity
 		 * @see android.os.AsyncTask#doInBackground(Params[])
 		 */
 		@Override
-		protected CONNECTION_PROBLEM doInBackground(Boolean... showMessageParms) {
+		protected CONNECTION_PROBLEM doInBackground(Boolean... showMessageParms)
+		{
 			showMessage = showMessageParms[0];
 			CONNECTION_PROBLEM prob = ComSettingsChecker
 					.checkStartUpConnection(getBaseContext());
-			if (prob != CONNECTION_PROBLEM.NO_PROBLEM) {
-				GLOBAL.mStatus.setConn(false, "");
-			} else {
-				GLOBAL.mStatus.setConn(true, DataHub.getFritzboxUrl(getBaseContext()));
+			if (prob != CONNECTION_PROBLEM.NO_PROBLEM)
+			{
+				GLOBAL.mStatus.setConn((prob.isError()) ?
+						ComStatus.CONN_AWAY : ComStatus.CONN_NOTFOUND, "");
+			}
+			else
+			{
+				GLOBAL.mStatus.setConn(ComStatus.CONN_AVAILABLE, DataHub.getFritzboxUrl(getBaseContext()));
 				GLOBAL.mStatus.setTr064Level(ComSettingsChecker.getTr064Level());
 			}
 			return prob;
@@ -422,7 +433,7 @@ public class FRITZApp extends Activity
 			    	Receiver.engine(FRITZApp.this).StartEngine();
 				}
 			}
-			else if (showMessage)
+			else if (showMessage && problem.isError())
 			{
 				showTextBox(problem);
 			}
@@ -607,11 +618,16 @@ public class FRITZApp extends Activity
 			errorMessage = R.string.empty;
 			allowFallback = false;
 		}
+		else if (fromDialpad && CallRouteExceptions.isException(this, number))
+		{
+			// call route exception -> Mobile only
+			mAskCallrouteHandler.fallbackCallroute(number, 0);
+		}
 		else if ((GLOBAL.mStatus == null) ||
 			(GLOBAL.mStatus.getSip() != ComStatus.SIP_AVAILABLE))
 		{
 			errorMessage = (GLOBAL.mStatus.isConnected()) ?
-					R.string.regno : R.string.connection_off;
+					R.string.regno : R.string.problem_wlan_disconnect;
 		}
 		else 
 		{
@@ -649,8 +665,9 @@ public class FRITZApp extends Activity
 	 */
 	public class AskCallrouteHandler extends Handler
 	{
+		private static final String PARAM_ASK = "ask";
 		private static final String PARAM_NUMBER = "number";
-		private static final String PARAM_RESID = "resid";
+		private static final String PARAM_ERRORID = "resid";
 
 		/**
 		 * Request user feedback on fallback to mobile network
@@ -661,8 +678,9 @@ public class FRITZApp extends Activity
 		public boolean fallbackCallroute(String number, int errorResId)
 		{
 			Bundle param = new Bundle();
+			param.putBoolean(PARAM_ASK, false);
 			param.putString(PARAM_NUMBER, number);
-			param.putInt(PARAM_RESID, errorResId);
+			param.putInt(PARAM_ERRORID, errorResId);
 			Message message = Message.obtain();
 			message.setData(param);
 			
@@ -677,8 +695,8 @@ public class FRITZApp extends Activity
 		public boolean askCallroute(String number)
 		{
 			Bundle param = new Bundle();
+			param.putBoolean(PARAM_ASK, true);
 			param.putString(PARAM_NUMBER, number);
-			param.putInt(PARAM_RESID, 0);
 			Message message = Message.obtain();
 			message.setData(param);
 			
@@ -690,19 +708,18 @@ public class FRITZApp extends Activity
 		{
 			try
 			{
-				String number = message.getData().getString(PARAM_NUMBER);
-				int fallbackResId = message.getData().getInt(PARAM_RESID);
-
 				if (mAlertDlg != null) mAlertDlg.cancel();
 				// TODO bring task to front
 //				boolean hadFocus = FRITZApp.this.hasWindowFocus();
 //				Log.d("FRITZApp.AskCallrouteHandler", "hadFocus == " + Boolean.toString(hadFocus));
 //				if (!hadFocus)
 //					FRITZApp.this.startActivity(new Intent(FRITZApp.this, FRITZApp.class));
-				if (fallbackResId == 0)
-					handleAskCallroute(number);
+
+				if (message.getData().getBoolean(PARAM_ASK))
+					handleAskCallroute(message.getData().getString(PARAM_NUMBER));
 				else
-					handleFallback(number, fallbackResId);
+					handleFallback(message.getData().getString(PARAM_NUMBER),
+							message.getData().getInt(PARAM_ERRORID));
 //				if (!hadFocus) moveTaskToBack(true);
 			}
 			catch (Exception exp) { }
@@ -748,6 +765,21 @@ public class FRITZApp extends Activity
 		
 		private void handleFallback(final String number, final int resId)
 		{
+			if (resId == 0)
+			{
+				// no error to show -> just fall back
+				Dialpad.saveAsRedial(FRITZApp.this, number);
+				try
+				{
+					Caller.sendCallIntent(FRITZApp.this, number);
+				}
+				catch (Exception exp)
+				{
+					exp.printStackTrace();
+				}
+				return;
+			}
+			
 			// ask for fallback
 			mAlertDlg = TextDialog.create(FRITZApp.this,
 					FRITZApp.this.getString(R.string.app_name),

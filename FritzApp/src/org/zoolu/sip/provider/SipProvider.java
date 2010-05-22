@@ -444,6 +444,7 @@ public class SipProvider implements Configurable, TransportListener,
 			nmax_connections = par.getInt();
 			return;
 		}
+		/*
 		if (attribute.equals("outbound_proxy")) {
 			String soaddr = par.getString();
 			if (soaddr == null || soaddr.length() == 0
@@ -454,6 +455,7 @@ public class SipProvider implements Configurable, TransportListener,
 				outbound_proxy = new SocketAddress(soaddr);
 			return;
 		}
+		*/
 		if (attribute.equals("log_all_packets")) {
 			log_all_packets = (par.getString().toLowerCase().startsWith("y"));
 			return;
@@ -1097,15 +1099,18 @@ public class SipProvider implements Configurable, TransportListener,
 			}
 
 			RequestLine rl = msg.getRequestLine();
-			String meth = rl.getMethod();
-			if(meth.equalsIgnoreCase("INVITE")) {
-				// NB: fix/hack: if we're here, no listener has answered this INVITE with a "486" although there's likely a pending call.
-				// todo: find a better way to do this via SipProviderListener / don't terminate() the InviteTransactionServer in InviteDialog.cancel().
-				printLog("----> sending '486 busy here' because there's propably a pending call. <----", LogLevel.HIGH);
-				Message resp = MessageFactory.createResponse(msg, 486, SipResponses.reasonOf(486), null);
-				sendMessage(resp);
-				return;
+			if(rl != null) {
+				String meth = rl.getMethod();
+				if(meth != null && meth.equalsIgnoreCase("INVITE")) {
+					// NB: fix/hack: if we're here, no listener has answered this INVITE with a "486" although there's likely a pending call.
+					// todo: find a better way to do this via SipProviderListener / don't terminate() the InviteTransactionServer in InviteDialog.cancel().
+					printLog("----> sending '486 busy here' because there's propably a pending call. <----", LogLevel.HIGH);
+					Message resp = MessageFactory.createResponse(msg, 486, SipResponses.reasonOf(486), null);
+					sendMessage(resp);
+					return;
+				}
 			}
+			
 			// if we are here, no listener_ID matched..
 			printLog(
 					"No SipListener found matching that message: message DISCARDED",

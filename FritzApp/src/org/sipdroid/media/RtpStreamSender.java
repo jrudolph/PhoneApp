@@ -33,18 +33,14 @@ import org.sipdroid.net.RtpSocket;
 import org.sipdroid.net.SipdroidSocket;
 import org.sipdroid.pjlib.Codec;
 
-import de.avm.android.fritzapp.sipua.UserAgent;
-import de.avm.android.fritzapp.sipua.ui.Receiver;
-import de.avm.android.fritzapp.gui.SettingsActivity;
-import de.avm.android.fritzapp.sipua.ui.Sipdroid;
-
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
-import android.content.Context;
+import android.os.Build;
+import de.avm.android.fritzapp.sipua.UserAgent;
+import de.avm.android.fritzapp.sipua.ui.Receiver;
+import de.avm.android.fritzapp.sipua.ui.Sipdroid;
 
 /**
  * RtpStreamSender is a generic stream sender. It takes an InputStream and sends
@@ -66,6 +62,9 @@ public class RtpStreamSender extends Thread {
 	/** Number of bytes per frame */
 	int frame_size;
 
+	public enum RecordEngineState {STATE_NOTHING, STATE_INITIALIZED, STATE_UNINITIALIZED};
+	private RecordEngineState recordEngineState;
+	
 	/**
 	 * Whether it works synchronously with a local clock, or it it acts as slave
 	 * of the InputStream
@@ -142,6 +141,7 @@ public class RtpStreamSender extends Thread {
 			int payload_type, long frame_rate, int frame_size,
 			SipdroidSocket src_socket, String dest_addr,
 			int dest_port) {
+		this.recordEngineState = RecordEngineState.STATE_NOTHING;
 		this.p_type = payload_type;
 		this.frame_rate = frame_rate;
 		this.frame_size = frame_size;
@@ -254,6 +254,14 @@ public class RtpStreamSender extends Thread {
 		}
 	}
 	
+	public synchronized RecordEngineState recordEngineInitialized() {
+		return recordEngineState;
+	}
+	
+	private synchronized void changeRecordEngineState(RecordEngineState state) {
+		recordEngineState = state;
+	}
+	
 	public static int m;
 	
 	/** Runs it in a new Thread. */
@@ -262,11 +270,11 @@ public class RtpStreamSender extends Thread {
 			return;
 		byte[] buffer = new byte[frame_size + 12];
 		RtpPacket rtp_packet = new RtpPacket(buffer, 0);
+		running = true;
 		rtp_packet.setPayloadType(p_type);
 		int seqn = 0;
 		long time = 0;
 		double p = 0;
-		running = true;
 		m = 1;
 		int dtframesize = 4;
 		int micgain = (int)(Sipdroid.getMicGain()*10);
@@ -279,10 +287,21 @@ public class RtpStreamSender extends Thread {
 			println("Reading blocks of " + buffer.length + " bytes");
 
 		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+		int mu = 1;
 		int min = AudioRecord.getMinBufferSize(8000,
-				AudioFormat.CHANNEL_CONFIGURATION_MONO, 
-				AudioFormat.ENCODING_PCM_16BIT);
+				AudioFormat.CHANNEL_CONFIGURATION_MONO,
+				AudioFormat.ENCODING_PCM_16BIT) * (1+mu) / 2;
 		AudioRecord record = new AudioRecord(MediaRecorder.AudioSource.MIC, 8000, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, min);
+		int engineState = record.getState(); 
+		if(engineState == AudioRecord.STATE_UNINITIALIZED) {
+			println("Error initializing audio record engine.");
+			running = false;
+			changeRecordEngineState(RecordEngineState.STATE_UNINITIALIZED);
+			record = null;
+			return;
+		}
+		else
+			changeRecordEngineState(RecordEngineState.STATE_INITIALIZED);
 		short[] lin = new short[frame_size*11];
 		int num,ring = 0;
 		random = new Random();
@@ -304,14 +323,16 @@ public class RtpStreamSender extends Thread {
 		record.startRecording();
 		while (running) {
 			 if (muted || Receiver.call_state == UserAgent.UA_STATE_HOLD) {
-				record.stop();
-				while (running && (muted || Receiver.call_state == UserAgent.UA_STATE_HOLD)) {
-					try {
-						sleep(1000);
-					} catch (InterruptedException e1) {
-					}
-				}
-				record.startRecording();
+				 if(Receiver.call_state == UserAgent.UA_STATE_HOLD)
+					 RtpStreamReceiver.restoreMode();
+				 record.stop();
+				 while (running && (muted || Receiver.call_state == UserAgent.UA_STATE_HOLD)) {
+					 try {
+						 sleep(1000);
+					 } catch (InterruptedException e1) {
+					 }
+				 }
+				 record.startRecording();
 			 }
 			 // DTMF change start
              if (dtmf!=0) {
@@ -359,7 +380,7 @@ public class RtpStreamSender extends Thread {
              }
 			 // DTMF change end             
 			 
-             if (frame_size == 160) {
+             if (frame_size < 960) {
 				 now = System.currentTimeMillis();
 				 next_tx_delay = frame_period - (now - last_tx_time);
 				 last_tx_time = now;
@@ -375,7 +396,7 @@ public class RtpStreamSender extends Thread {
 			 if (num <= 0)
 				 continue;
 
-			 if (RtpStreamReceiver.speakermode == AudioManager.MODE_NORMAL) {
+			 if (RtpStreamReceiver.getSpeakermode() == AudioManager.MODE_NORMAL) {
  				 calc(lin,(ring+delay*frame_size)%(frame_size*11),num);
  	 			 if (RtpStreamReceiver.nearend != 0)
 	 				 noise(lin,(ring+delay*frame_size)%(frame_size*11),num,p);
@@ -398,9 +419,9 @@ public class RtpStreamSender extends Thread {
 			 if (Receiver.call_state != UserAgent.UA_STATE_INCALL &&
 					 Receiver.call_state != UserAgent.UA_STATE_OUTGOING_CALL && alerting != null) {
 				 try {
-					if (alerting.available() < num)
+					if (alerting.available() < num/mu)
 						alerting.reset();
-					alerting.read(buffer,12,num);
+					alerting.read(buffer,12,num/mu);
 				 } catch (IOException e) {
 					if (!Sipdroid.release) e.printStackTrace();
 				 }
@@ -437,8 +458,17 @@ public class RtpStreamSender extends Thread {
 				sleep(1000);
 			} catch (InterruptedException e) {
 		}	
-		*/	
+		*/
+		if(!Build.MODEL.contains("Samsung") && Integer.parseInt(Build.VERSION.SDK) < 5)
+			while(RtpStreamReceiver.getMode() == AudioManager.MODE_IN_CALL)
+				try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+				}
+		
 		record.stop();
+		record.release();
+		m = 0;
 		
 		rtp_socket.close();
 		rtp_socket = null;

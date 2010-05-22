@@ -167,6 +167,8 @@ public class RegisterAgent implements TransactionClientListener, SubscriberDialo
 	public boolean register() {
 		return register(expire_time);
 	}
+	
+	TransactionClient t;
 
 	/** Registers with the registrar server for <i>expire_time</i> seconds. */
 	public boolean register(int expire_time) {
@@ -175,7 +177,10 @@ public class RegisterAgent implements TransactionClientListener, SubscriberDialo
 		{
 			//Update this to be the default registration duration for next
 			//instances as well.
-			
+			if (CurrentState == DEREGISTERING) {
+				t.terminate();
+				onTransTimeout(t);
+			}
 			if (CurrentState != UNREGISTERED && CurrentState != REGISTERED)
 			{
 				return false;
@@ -185,6 +190,10 @@ public class RegisterAgent implements TransactionClientListener, SubscriberDialo
 		}
 		else
 		{
+			if (CurrentState == REGISTERING) {
+				t.terminate();
+				onTransTimeout(t);
+			}
 			if (CurrentState != REGISTERED)
 			{
 				//This is an error condition we must exit, we should not de-register if
@@ -229,7 +238,7 @@ public class RegisterAgent implements TransactionClientListener, SubscriberDialo
 			printLog("Unregistering contact " + contact, LogLevel.HIGH);
 		}
 		
-		TransactionClient t = new TransactionClient(sip_provider, req, this);
+		t = new TransactionClient(sip_provider, req, this, 30000);
 		t.request();
 		
 		return true;
@@ -575,7 +584,7 @@ public class RegisterAgent implements TransactionClientListener, SubscriberDialo
 			req.addViaHeader(vh);
 
 			if (handleAuthentication(respCode, resp, req)) {
-				TransactionClient t = new TransactionClient(sip_provider, req, this);
+				t = new TransactionClient(sip_provider, req, this, 30000);
 			
 				t.request();
 				return true;

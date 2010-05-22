@@ -47,33 +47,47 @@ public class StatusDisplayHandler implements Runnable
 	@Override
 	public void run()
 	{
-		int backgroundBox = R.drawable.state_box_away;
+		int backgroundBox = R.drawable.state_box_disabled;
 		int backgroundSip = R.drawable.state_sip_disabled;
+		int boxTextAppearance = R.style.StatusDisplayTextDisabledAppearance;
 		int sipTextAppearance = R.style.StatusDisplayTextDisabledAppearance;
 		
-		if ((GLOBAL.mStatus != null) && (GLOBAL.mStatus.isConnected()))
+		if (GLOBAL.mStatus != null)
 		{
-			backgroundBox = R.drawable.state_box_available;
-			switch(GLOBAL.mStatus.getSip())
+			if (GLOBAL.mStatus.isConnected())
 			{
-				case ComStatus.SIP_IDLE:
-					backgroundSip = R.drawable.state_sip_idle;
-					sipTextAppearance = R.style.StatusDisplayTextAppearance;
-					break;
-				
-				case ComStatus.SIP_AWAY:
-					backgroundSip = R.drawable.state_sip_away;
-					sipTextAppearance = R.style.StatusDisplayTextAppearance;
-					break;
-
-				case ComStatus.SIP_AVAILABLE:
-					backgroundSip = R.drawable.state_sip_available;
-					sipTextAppearance = R.style.StatusDisplayTextAppearance;
-					break;
+				backgroundBox = R.drawable.state_box_available;
+				boxTextAppearance = R.style.StatusDisplayTextAppearance;
+				switch(GLOBAL.mStatus.getSip())
+				{
+					case ComStatus.SIP_IDLE:
+						backgroundSip = R.drawable.state_sip_idle;
+						sipTextAppearance = R.style.StatusDisplayTextAppearance;
+						break;
+					
+					case ComStatus.SIP_AWAY:
+						backgroundSip = R.drawable.state_sip_away;
+						sipTextAppearance = R.style.StatusDisplayTextAppearance;
+						break;
+	
+					case ComStatus.SIP_AVAILABLE:
+						backgroundSip = R.drawable.state_sip_available;
+						sipTextAppearance = R.style.StatusDisplayTextAppearance;
+						break;
+				}
+			}
+			else if (GLOBAL.mStatus.getConn() == ComStatus.CONN_AWAY)
+			{
+				backgroundBox = R.drawable.state_box_away;
+				boxTextAppearance = R.style.StatusDisplayTextAppearance;
 			}
 		}
 
-		if (mStatusBox != null) mStatusBox.setBackgroundResource(backgroundBox);
+		if (mStatusBox != null)
+		{
+			mStatusBox.setBackgroundResource(backgroundBox);
+			mStatusBox.setTextAppearance(mContext, boxTextAppearance);
+		}
 		if (mStatusSip != null)
 		{
 			mStatusSip.setBackgroundResource(backgroundSip);

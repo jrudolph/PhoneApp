@@ -27,6 +27,7 @@ public interface MediaLauncher {
 	/** Stops media application */
 	public boolean stopMedia();
 	
+	public boolean mediaOk(boolean wait);
 	public boolean muteMedia();
 	public int speakerMedia(int mode);
 	
