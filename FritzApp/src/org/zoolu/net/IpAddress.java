@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2005 Luca Veltri - University of Parma - Italy
+ * Copyright (C) 2010 AVM GmbH <info@avm.de>
  * Copyright (C) 2009 The Sipdroid Open Source Project
+ * Copyright (C) 2005 Luca Veltri - University of Parma - Italy
  * 
  * This file is part of MjSip (http://www.mjsip.org)
  * 
@@ -28,6 +29,8 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+
+import de.avm.android.fritzapp.util.InetAddressHelper;
 
 /**
  * IpAddress is an IP address.
@@ -60,7 +63,9 @@ public class IpAddress {
 	InetAddress getInetAddress() {
 		if (inet_address == null)
 			try {
-				inet_address = InetAddress.getByName(address);
+				// ADO: we use v4 addresses only!
+				inet_address = InetAddressHelper.getByName(address);
+//				inet_address = InetAddress.getByName(address);
 			} catch (java.net.UnknownHostException e) {
 				inet_address = null;
 			}
@@ -114,7 +119,10 @@ public class IpAddress {
 	/** Gets the IpAddress for a given fully-qualified host name. */
 	public static IpAddress getByName(String host_addr)
 			throws java.net.UnknownHostException {
-		InetAddress iaddr = InetAddress.getByName(host_addr);
+		
+		// ADO: we use v4 addresses only!
+		InetAddress iaddr = InetAddressHelper.getByName(host_addr);
+//		InetAddress iaddr = InetAddress.getByName(host_addr);
 		return new IpAddress(iaddr);
 	}
 	

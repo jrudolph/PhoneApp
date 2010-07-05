@@ -155,16 +155,17 @@ public class SAXPhoneBookHandler extends DefaultHandler {
 	 *            the length
 	 */
 	@Override
-	public void characters(char ch[], int start, int length) {
+	public void characters(char ch[], int start, int length)
+	{
 		String str = new String(ch, start,length);
 		if (this.in_category) {
 			currentContact.setCategory(Integer.parseInt(str));
 		}
 		if (this.in_realName) {
-			currentContact.setRealName(str);			
+			currentContact.setRealName(currentContact.getRealName() + str);			
 		}
 		if (this.in_number) {
-			currentContactNumber.setNumber(str);
+			currentContactNumber.setNumber(currentContactNumber.getNumber() + str);
 		}
 	}
 

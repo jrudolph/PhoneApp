@@ -102,6 +102,7 @@ public class JAudioLauncher implements MediaLauncher
 
    /** Checks if audio engine works correctly */
    public boolean mediaOk(boolean wait) {
+	   boolean ok;
 	   if(sender == null || receiver == null) {
 		   return false;
 	   }
@@ -118,8 +119,12 @@ public class JAudioLauncher implements MediaLauncher
 		   else
 			   break;
 	   }
-	   return (RtpStreamSender.RecordEngineState.STATE_INITIALIZED == sender.recordEngineInitialized() &&
+	   ok = (RtpStreamSender.RecordEngineState.STATE_INITIALIZED == sender.recordEngineInitialized() &&
 			   RtpStreamReceiver.AudioEngineState.STATE_INITIALIZED == receiver.audioEngineInitialized());
+	   if(!ok) {
+		   android.util.Log.e("JAudioLauncher", "ERROR initializing audio record or playback engine!");		   
+	   }
+	   return ok;
    }
    
    /** Starts media application */

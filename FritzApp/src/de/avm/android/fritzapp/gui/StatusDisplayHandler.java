@@ -44,7 +44,6 @@ public class StatusDisplayHandler implements Runnable
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
-	@Override
 	public void run()
 	{
 		int backgroundBox = R.drawable.state_box_disabled;

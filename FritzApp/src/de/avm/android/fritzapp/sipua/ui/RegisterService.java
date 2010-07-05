@@ -63,7 +63,7 @@ public class RegisterService extends Service {
 	         registerReceiver(m_caller = new Caller(), intentfilter);      
         }
         Receiver.engine(this).isRegistered();
-        RtpStreamReceiver.restoreSettings();
+        RtpStreamReceiver.restoreSettings(false);
     }
     
     @Override

@@ -81,7 +81,7 @@ public class TextDialog
 			String text)
 	{
 		return create(context, context.getString(DEFAULT_TITLE), text)
-				.setPositiveButton(android.R.string.ok,
+				.setPositiveButton(R.string.ok,
 						new DialogInterface.OnClickListener()
 				{
 					public void onClick(DialogInterface dialog, int which)
@@ -103,7 +103,7 @@ public class TextDialog
 	{
 		return create(context, context.getString(DEFAULT_TITLE),
 				text, iconId)
-				.setPositiveButton(android.R.string.ok,
+				.setPositiveButton(R.string.ok,
 						new DialogInterface.OnClickListener()
 				{
 					public void onClick(DialogInterface dialog, int which)

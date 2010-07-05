@@ -66,6 +66,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import de.avm.android.fritzapp.GLOBAL;
+import de.avm.android.fritzapp.util.InetAddressHelper;
 
 /**
  * Class to discover an UPNP device on the network.</br> A multicast socket will
@@ -232,7 +233,7 @@ public class FritzBoxDiscovery {
 		if (port != null) {
 			bindPort = Integer.parseInt(port);
 		}
-		InetSocketAddress adr = new InetSocketAddress(InetAddress
+		InetSocketAddress adr = new InetSocketAddress(InetAddressHelper
 				.getByName(FritzBoxDiscovery.SSDP_IP),
 				FritzBoxDiscovery.SSDP_PORT);
 

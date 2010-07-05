@@ -131,8 +131,9 @@ public class ContactNumber implements Parcelable {
 	 * 
 	 * @return the number
 	 */
-	public String getNumber() {
-		return number;
+	public String getNumber()
+	{
+		return (number == null) ? "" : number;
 	}
 
 	/**

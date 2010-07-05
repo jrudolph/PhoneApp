@@ -217,7 +217,6 @@ public class Dialpad extends SlidingDrawer implements View.OnClickListener,
 
 	EditText mDigits = null;
 	
-	@Override
 	public void onClick(View v)
 	{
 		if (isOpened())
@@ -241,7 +240,6 @@ public class Dialpad extends SlidingDrawer implements View.OnClickListener,
 		}
 	}
 
-	@Override
 	public boolean onLongClick(View v)
 	{
 		if (isOpened())
@@ -256,19 +254,23 @@ public class Dialpad extends SlidingDrawer implements View.OnClickListener,
 		return false;
 	}
 
-	@Override
 	public boolean onKey(View v, int keyCode, KeyEvent event)
 	{
 		if (isOpened())
 		{
-	        char digit = event.getNumber();
-			for(int ii = 0; ii < mCharacters.length; ++ii)
+			if (event.getKeyCode() == KeyEvent.KEYCODE_DEL)
 			{
-				if (mCharacters[ii] == digit)
-				{
-    	        	appendDigit(digit);
-    	        	break;
-				}
+		    	removeLastDigit();
+		    	return true;
+			}
+			else
+			{
+				char digit = event.getMatch(mCharacters);
+		        if (digit != '\0')
+		        {
+		        	appendDigit(digit);
+			    	return true;
+		        }
 			}
 		}
 		

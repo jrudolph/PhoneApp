@@ -122,8 +122,8 @@ public class Caller extends BroadcastReceiver
 			} 
 			else if (number != null)
 			{
-				if (Receiver.engine(context).call(PhoneNumberHelper
-						.fixInternationalDialingPrefix(number)))
+				if (Receiver.engine(context).call(PhoneNumberHelper.decorateNumber(context, 
+						PhoneNumberHelper.fixInternationalDialingPrefix(number))))
 				{
 					setResultData(null);
 					Dialpad.saveAsRedial(context, number);

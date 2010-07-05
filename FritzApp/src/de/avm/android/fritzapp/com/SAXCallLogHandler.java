@@ -178,13 +178,13 @@ public class SAXCallLogHandler extends DefaultHandler {
 			currentCall.setType(Call.getCallTypeForKey(string));
 		}
 		if (this.in_caller) {
-			currentCall.setPartnerNumber(string);
+			currentCall.setPartnerNumber(currentCall.getPartnerNumber() + string);
 		}
 		if (this.in_called) {
-			currentCall.setInternNumber(string);
+			currentCall.setInternNumber(currentCall.getInternNumber() + string);
 		}
 		if (this.in_name) {
-			currentCall.setPartnerName(string);
+			currentCall.setPartnerName(currentCall.getPartnerName() + string);
 		}
 		if (this.in_numbertype) {
 			currentCall.setNumberType(NUMBER_TYPE.getNumberTypeForKey(string));

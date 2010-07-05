@@ -69,7 +69,7 @@ public class SipdroidEngine implements RegisterAgentListener {
 	private static final long REREGISTER_TIMEOUT = 15000; // 15s
 	private Timer reregister_timeout = null;
 	
-	static PowerManager.WakeLock wl;
+	static PowerManager.WakeLock wl, pwl;
 	
 	public void finalize() {
 		remove_reregister_timeout();
@@ -78,7 +78,11 @@ public class SipdroidEngine implements RegisterAgentListener {
 	public boolean StartEngine() {
 		try {
 			PowerManager pm = (PowerManager) getUIContext().getSystemService(Context.POWER_SERVICE);
-			if (wl == null) wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FRITZApp.SipdroidEngine");
+			if (wl == null)
+			{
+				wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FRITZApp.SipdroidEngine");
+				pwl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "FRITZApp.SipdroidEngine");
+			}
 
 			user_profile = new UserAgentProfile(null);
 			user_profile.username = Sipdroid.getSipUser();
@@ -198,6 +202,7 @@ public class SipdroidEngine implements RegisterAgentListener {
 			Receiver.alarm(0, LoopAlarm.class);
 			GLOBAL.mStatus.setSip(ComStatus.SIP_IDLE, "");
 			wl.acquire();
+			if (pwl != null && Receiver.on_wlan) pwl.acquire();
 		}		
 	}
 	
@@ -216,6 +221,7 @@ public class SipdroidEngine implements RegisterAgentListener {
 				if(reregister_timeout == null)
 					GLOBAL.mStatus.setSip(ComStatus.SIP_IDLE, "");
 				wl.acquire();
+				if (pwl != null && Receiver.on_wlan) pwl.acquire();
 			}
 		}
 		} catch (Exception ex) {
@@ -224,8 +230,10 @@ public class SipdroidEngine implements RegisterAgentListener {
 
 	public void halt() { // modified
 		remove_reregister_timeout();
-		if (wl.isHeld())
+		if (wl.isHeld()) {
 			wl.release();
+			if (pwl != null && pwl.isHeld()) pwl.release();
+		}
 		if (ka != null) {
 			Receiver.alarm(0, LoopAlarm.class);
 			ka.halt();
@@ -260,8 +268,10 @@ public class SipdroidEngine implements RegisterAgentListener {
 		Receiver.registered();
 		ra.subattempts = 0;
 		ra.startMWI();
-		if (wl.isHeld())
+		if (wl.isHeld()) {
 			wl.release();
+			if (pwl != null && pwl.isHeld()) pwl.release();
+		}
 	}
 
 	String lastmsgs;
@@ -289,8 +299,10 @@ public class SipdroidEngine implements RegisterAgentListener {
 	public void onUaRegistrationFailure(RegisterAgent ra, NameAddress target,
 			NameAddress contact, String result) {
 		GLOBAL.mStatus.setSip(ComStatus.SIP_AWAY, result);
-		if (wl.isHeld())
+		if (wl.isHeld()) {
 			wl.release();
+			if (pwl != null && pwl.isHeld()) pwl.release();
+		}
 		if (SystemClock.uptimeMillis() > lasthalt + 45000) {
 			lasthalt = SystemClock.uptimeMillis();
 			sip_provider.haltConnections();
@@ -359,14 +371,10 @@ public class SipdroidEngine implements RegisterAgentListener {
 		if (ua.muteMediaApplication())
 			Receiver.onText(Receiver.CALL_NOTIFICATION, getUIContext().getString(R.string.menu_mute), android.R.drawable.stat_notify_call_mute,Receiver.ccCall.base);
 		else
-			Receiver.onText(Receiver.CALL_NOTIFICATION, getUIContext().getString(R.string.card_title_in_progress), R.drawable.stat_sys_phone_call,Receiver.ccCall.base);			
+			Receiver.onText(Receiver.CALL_NOTIFICATION, getUIContext().getString(R.string.card_title_in_progress), android.R.drawable.stat_sys_phone_call,Receiver.ccCall.base);			
 	}
 	
 	public int speaker(int mode) {
-		if (mode == AudioManager.MODE_NORMAL)
-			Receiver.onText(Receiver.CALL_NOTIFICATION, getUIContext().getString(R.string.menu_speaker), android.R.drawable.stat_sys_speakerphone,Receiver.ccCall.base);
-		else
-			Receiver.onText(Receiver.CALL_NOTIFICATION, getUIContext().getString(R.string.card_title_in_progress), R.drawable.stat_sys_phone_call,Receiver.ccCall.base);
 		return ua.speakerMediaApplication(mode);
 	}
 	

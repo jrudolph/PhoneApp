@@ -43,6 +43,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.avm.android.fritzapp.GLOBAL;
 import de.avm.android.fritzapp.R;
 import de.avm.android.fritzapp.com.ComSettingsChecker;
@@ -75,6 +76,8 @@ public class FRITZApp extends Activity
 	private static AlertDialog mAlertDlg = null;
 	private StatusDisplayHandler mStatusDisplayHandler = null;
 	private AskCallrouteHandler mAskCallrouteHandler = new AskCallrouteHandler();
+	
+	private boolean mOverrideClirOnce = false;
 
 	/*
 	 * (non-Javadoc)
@@ -252,6 +255,19 @@ public class FRITZApp extends Activity
 		// status display
 		GLOBAL.mStatus.removeStatusChangedHandler(mStatusDisplayHandler);
 	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		if (GLOBAL.mConnectivityChangeReceiver != null)
+		{
+			try { GLOBAL.mConnectivityChangeReceiver.Unregister(); }
+			catch(Exception exp) { }
+			GLOBAL.mConnectivityChangeReceiver = null;
+		}
+		
+		super.onDestroy();
+	}
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -263,6 +279,19 @@ public class FRITZApp extends Activity
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+	 */
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		menu.findItem(R.id.Clir)
+				.setTitle((PhoneNumberHelper.isClir(this) == mOverrideClirOnce) ?
+							R.string.menu_clir_on : R.string.menu_clir_off);
+		return true;
+		
+	}
+	
 	/**
 	 * Sets WifiSleepPolicy
 	 * @param wifiSleepPolicy value to set
@@ -293,6 +322,14 @@ public class FRITZApp extends Activity
 	{
 		switch (item.getItemId())
 		{
+			case R.id.Clir:
+				mOverrideClirOnce = !mOverrideClirOnce;
+				if (mOverrideClirOnce)
+					Toast.makeText(this, (PhoneNumberHelper.isClir(this)) ?
+							R.string.hint_clir_off_once : R.string.hint_clir_on_once,
+							Toast.LENGTH_SHORT).show();
+				break;
+		
 			case R.id.Settings: 
 				startActivity(new Intent(this, SettingsActivity.class));
 				break;
@@ -606,6 +643,7 @@ public class FRITZApp extends Activity
 	void callNow()
 	{
 		callNow((mDialpad == null) ? "" : mDialpad.getText(), true, true);
+		mOverrideClirOnce = false;
 	}
 	
 	void callNow(String number, boolean allowFallback, boolean fromDialpad)
@@ -632,8 +670,9 @@ public class FRITZApp extends Activity
 		else 
 		{
 			Sipdroid.mBackToMainActivity = true;
-			if (Receiver.engine(this).call(PhoneNumberHelper
-					.fixInternationalDialingPrefix(number)))
+			if (Receiver.engine(this).call(PhoneNumberHelper.decorateNumber(this,
+					(fromDialpad) ? mOverrideClirOnce : false,
+					PhoneNumberHelper.fixInternationalDialingPrefix(number))))
 			{
 				if (fromDialpad)
 					mDialpad.saveTextAsRedial(this);

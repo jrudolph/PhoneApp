@@ -42,6 +42,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.media.RingtoneManager;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -61,6 +62,7 @@ import de.avm.android.fritzapp.com.IData;
 import de.avm.android.fritzapp.sipua.ui.Receiver;
 import de.avm.android.fritzapp.sipua.ui.SipRingtonePreference;
 import de.avm.android.fritzapp.sipua.ui.Sipdroid;
+import de.avm.android.fritzapp.util.PhoneNumberHelper;
 
 /* GUI for the settings of the app */
 public class SettingsActivity extends PreferenceActivity implements
@@ -208,6 +210,14 @@ public class SettingsActivity extends PreferenceActivity implements
 		ringtonePref.setPersistent(false);
 		group.addPreference(ringtonePref);
 
+		// CLIR
+		CheckBoxPreference clirPref = new CheckBoxPreference(this);
+		clirPref.setKey(PhoneNumberHelper.PREF_CLIR);
+		clirPref.setDefaultValue(PhoneNumberHelper.DEFAULT_CLIR);
+		clirPref.setTitle(R.string.settings_clir);
+		clirPref.setSummary(R.string.settings_clir2);
+		group.addPreference(clirPref);
+		
 		// exception list
 		final PreferenceScreen expPref =
 			getPreferenceManager().createPreferenceScreen(this); 
@@ -231,7 +241,6 @@ public class SettingsActivity extends PreferenceActivity implements
 		return root;
 	}
 
-	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key)
 	{

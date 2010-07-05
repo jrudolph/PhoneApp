@@ -12,6 +12,7 @@
 
 package de.avm.android.fritzapp.gui;
 
+import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,6 +41,7 @@ import de.usbi.android.util.adapter.OnClickStartActivity;
 public class CallLogActivity extends TabActivity implements OfflineActivity {
 	
 	public static final String EXTRA_CALL_DATA_KEY = "CALL_DATA";
+	public static final int SOAP_FAILED = 1;
 
 	private IData fritzBox = new DataHub();
 
@@ -51,33 +53,26 @@ public class CallLogActivity extends TabActivity implements OfflineActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.calllog);
 
+		TabHost tabHost = getTabHost();
+		CallLog callLog = null;
+
 		try
 		{
 			// Lade die Daten von der FRITZ!Box
-			CallLog callLog = fritzBox.getCallLog(getBaseContext());
-			
-			// Tabs anlegen
-			TabHost tabHost = getTabHost();
-			createTab(callLog, tabHost, null, R.id.ListContentAll);
-			createTab(callLog, tabHost, CALL_TYPE.OUTGOING, R.id.ListContent1);
-			createTab(callLog, tabHost, CALL_TYPE.INCOMING, R.id.ListContent2);
-			createTab(callLog, tabHost, CALL_TYPE.MISSED, R.id.ListContent3);
+			callLog = fritzBox.getCallLog(getBaseContext());
 		}
 		catch(Exception exp)
 		{
 			exp.printStackTrace();
-			TextDialog.create(this, getString(R.string.app_name),
-					getString(R.string.soap_tranfer_failed))
-					.setPositiveButton(android.R.string.ok,
-							new DialogInterface.OnClickListener()
-					{
-						public void onClick(DialogInterface dialog, int which)
-						{
-							CallLogActivity.this.finish();
-						}
-					})
-					.show();
 		}
+		
+		// Tabs anlegen
+		createTab(callLog, tabHost, null, R.id.ListContentAll);
+		createTab(callLog, tabHost, CALL_TYPE.OUTGOING, R.id.ListContent1);
+		createTab(callLog, tabHost, CALL_TYPE.INCOMING, R.id.ListContent2);
+		createTab(callLog, tabHost, CALL_TYPE.MISSED, R.id.ListContent3);
+
+		if (callLog == null) showDialog(SOAP_FAILED);
 	}
 	
 	/**
@@ -117,7 +112,8 @@ public class CallLogActivity extends TabActivity implements OfflineActivity {
 				return false;
 			}
 		});
-		listView.setAdapter(new CallLogAdapter(callLogData, callType));
+		listView.setAdapter((callLogData == null) ?
+				null : new CallLogAdapter(callLogData, callType));
 	}
 
 	/**
@@ -198,6 +194,27 @@ public class CallLogActivity extends TabActivity implements OfflineActivity {
 		}
 	}
 
+	@Override
+	protected Dialog onCreateDialog(int id)
+	{
+		switch (id)
+		{
+			case SOAP_FAILED:
+				return TextDialog.create(this, getString(R.string.app_name),
+						getString(R.string.soap_tranfer_failed))
+						.setPositiveButton(R.string.ok,
+								new DialogInterface.OnClickListener()
+						{
+							public void onClick(DialogInterface dialog, int which)
+							{
+								CallLogActivity.this.finish();
+							}
+						})
+						.create();
+		}
+		return null;
+	}
+	
 	public static Intent showIntent(Context context)
 	{
 		if (GLOBAL.mStatus.isConn() &&

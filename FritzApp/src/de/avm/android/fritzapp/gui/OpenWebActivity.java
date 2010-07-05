@@ -27,6 +27,7 @@ import de.avm.android.fritzapp.R;
 import de.avm.android.fritzapp.com.ComSettingsChecker;
 import de.avm.android.fritzapp.com.DataHub;
 import de.avm.android.fritzapp.com.JasonBoxinfo;
+import de.avm.android.fritzapp.util.InetAddressHelper;
 
 /*
  * Activity to show info about connected box and to
@@ -93,8 +94,24 @@ public class OpenWebActivity extends Activity implements OfflineActivity
 			}
 			
 			// my IP
-			((TextView)findViewById(R.id.Address))
-					.setText(ComSettingsChecker.getLocationIP());
+			String locationIP = ComSettingsChecker.getLocationIP();
+			if (locationIP.indexOf(':') >= 0)
+			{
+				// IPv6 -> show IPv4 too
+				try
+				{
+					locationIP += "\n(" + 
+							InetAddressHelper.getByName(DataHub
+									.getFritzboxUrlWithoutProtocol(this))
+									.getHostAddress()
+							+ ")";
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			((TextView)findViewById(R.id.Address)).setText(locationIP);
 			
 			// connected SSID
 			WifiInfo wifiInfo = ((WifiManager)getSystemService(Context.WIFI_SERVICE))

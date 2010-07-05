@@ -97,14 +97,13 @@ public class UserAgent extends CallListenerAdapter {
 	// *************************** Basic methods ***************************
 
 	/** Changes the call state */
-	protected void changeStatus(int state,String caller) {
+	protected synchronized void changeStatus(int state,String caller) {
 		call_state = state;
 		Receiver.onState(state, caller);
 	}
 	
 	protected void changeStatus(int state) {
-		call_state = state;
-		Receiver.onState(state, null);
+		changeStatus(state, null);
 	}
 
 	/** Checks the call state */
@@ -374,9 +373,9 @@ public class UserAgent extends CallListenerAdapter {
 			return false;
 		}
 		
-		call.accept(local_session);
-				
 		changeStatus(UA_STATE_INCALL);
+		
+		call.accept(local_session);
 		
 		return true;
 	}

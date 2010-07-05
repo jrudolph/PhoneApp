@@ -32,6 +32,8 @@ import java.net.UnknownHostException;
 import org.sipdroid.net.impl.OSNetworkSystem;
 import org.sipdroid.net.impl.PlainDatagramSocketImpl;
 
+import de.avm.android.fritzapp.util.InetAddressHelper;
+
 public class SipdroidSocket extends DatagramSocket {
 
 	PlainDatagramSocketImpl impl;
@@ -42,7 +44,9 @@ public class SipdroidSocket extends DatagramSocket {
 		if (loaded) {
 			impl = new PlainDatagramSocketImpl();
 			impl.create();
-			impl.bind(port,InetAddress.getByName("0"));
+			// ADO: we use v4 addresses only!
+			impl.bind(port,InetAddressHelper.getByName("0"));
+//			impl.bind(port,InetAddress.getByName("0"));
 		}
 	}
 	

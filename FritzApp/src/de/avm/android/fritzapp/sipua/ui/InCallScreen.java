@@ -34,6 +34,7 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 import de.avm.android.fritzapp.sipua.phone.ContactsAsyncHelper;
 import de.avm.android.fritzapp.sipua.phone.Phone;
 import de.avm.android.fritzapp.sipua.phone.PhoneUtils;
+import de.avm.android.fritzapp.util.PhoneNumberHelper;
 
 
 import android.content.ContentResolver;
@@ -297,7 +298,7 @@ public class InCallScreen extends CallScreen
 			public void onClick(View v)
 			{
 				Receiver.engine(InCallScreen.this)
-						.speaker((RtpStreamReceiver.getSpeakermode() == AudioManager.MODE_NORMAL) ?
+						.speaker((RtpStreamReceiver.speakermode == AudioManager.MODE_NORMAL) ?
 								AudioManager.MODE_IN_CALL : AudioManager.MODE_NORMAL);
                 updateSpeakerButton();
 			}
@@ -588,7 +589,7 @@ public class InCallScreen extends CallScreen
 
 	private void updateSpeakerButton()
 	{
-		mSpeaker.setImageResource((RtpStreamReceiver.getSpeakermode() == AudioManager.MODE_NORMAL) ?
+		mSpeaker.setImageResource((RtpStreamReceiver.speakermode == AudioManager.MODE_NORMAL) ?
 				R.drawable.btn_speakeroff : R.drawable.btn_speaker);
 	}
 	
@@ -653,15 +654,16 @@ public class InCallScreen extends CallScreen
 
         if (info != null)
         {
+        	String phoneNumber = PhoneNumberHelper.stripNumber(info.phoneNumber);
             if (TextUtils.isEmpty(info.name))
             {
-            	name = (TextUtils.isEmpty(info.phoneNumber)) ?
-            			getString(R.string.unknown) : info.phoneNumber;
+            	name = (TextUtils.isEmpty(phoneNumber)) ?
+            			getString(R.string.unknown) : phoneNumber;
             }
             else
             {
                 name = info.name;
-                displayNumber = info.phoneNumber;
+                displayNumber = phoneNumber;
                 label = info.phoneLabel;
             }
         }
@@ -712,7 +714,6 @@ public class InCallScreen extends CallScreen
 	/* (non-Javadoc)
 	 * @see de.avm.android.fritzapp.sipua.phone.CallerInfoAsyncQuery.OnQueryCompleteListener#onQueryComplete(int, java.lang.Object, de.avm.android.fritzapp.sipua.phone.CallerInfo)
 	 */
-	@Override
 	public void onQueryComplete(int token, Object cookie, CallerInfo ci)
 	{
         if (cookie instanceof Call)

@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -28,6 +29,7 @@ import android.util.Log;
 import de.avm.android.fritzapp.GLOBAL;
 import de.avm.android.fritzapp.com.ComSettingsChecker;
 import de.avm.android.fritzapp.com.DataHub;
+import de.avm.android.fritzapp.util.InetAddressHelper;
 import de.usbi.android.util.error.exceptions.BaseException;
 import de.usbi.android.util.net.LazySSLHttpClientFactory;
 
@@ -78,8 +80,9 @@ public abstract class AbstractSoapHelper<RESULT> {
 		String ret = "";
 		try {
 			String soapEndpoint = "https://"
-					+ DataHub.getFritzboxUrlWithoutProtocol(context) + ":"
-					+ HTTPS_PORT + getControlURL();
+					+ InetAddressHelper.getByName(DataHub.getFritzboxUrlWithoutProtocol(context))
+						.getHostAddress() +
+					":" + HTTPS_PORT + getControlURL();
 			String requestBody = createRequestBody();
 			String soapAction = getNamespace() + "#" + getSoapMethod();
 			Log.v("SOAP-Endpoint", soapEndpoint);
@@ -104,10 +107,17 @@ public abstract class AbstractSoapHelper<RESULT> {
 				Log.v("REPLY", str);
 			}
 
-		} catch (ClientProtocolException e) {
-			// TODO
+		}
+		catch (UnknownHostException e)
+		{
+			handleConnectionProblem();
+		}
+		catch (ClientProtocolException e)
+		{
 			throw new BaseException("Invalid Response from FRITZ!Box");
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			handleConnectionProblem();
 		}
 		return ret;

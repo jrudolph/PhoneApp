@@ -87,7 +87,7 @@ public class PhoneBookActivity extends Activity implements OfflineActivity {
 			exp.printStackTrace();
 			TextDialog.create(this, getString(R.string.app_name),
 					getString(R.string.soap_tranfer_failed))
-					.setPositiveButton(android.R.string.ok,
+					.setPositiveButton(R.string.ok,
 							new DialogInterface.OnClickListener()
 					{
 						public void onClick(DialogInterface dialog, int which)

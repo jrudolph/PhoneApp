@@ -89,8 +89,9 @@ public class Contact implements Parcelable {
 	 * 
 	 * @return the real name
 	 */
-	public String getRealName() {
-		return realName;
+	public String getRealName()
+	{
+		return (realName == null) ? "" : realName;
 	}
 
 	/**

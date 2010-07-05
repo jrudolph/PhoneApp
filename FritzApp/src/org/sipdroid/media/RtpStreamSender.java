@@ -24,7 +24,6 @@ package org.sipdroid.media;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -41,6 +40,7 @@ import android.os.Build;
 import de.avm.android.fritzapp.sipua.UserAgent;
 import de.avm.android.fritzapp.sipua.ui.Receiver;
 import de.avm.android.fritzapp.sipua.ui.Sipdroid;
+import de.avm.android.fritzapp.util.InetAddressHelper;
 
 /**
  * RtpStreamSender is a generic stream sender. It takes an InputStream and sends
@@ -147,7 +147,9 @@ public class RtpStreamSender extends Thread {
 		this.frame_size = frame_size;
 		this.do_sync = do_sync;
 		try {
-			rtp_socket = new RtpSocket(src_socket, InetAddress
+			// ADO: we use v4 addresses only!
+//			rtp_socket = new RtpSocket(src_socket, InetAddress
+			rtp_socket = new RtpSocket(src_socket, InetAddressHelper
 					.getByName(dest_addr), dest_port);
 		} catch (Exception e) {
 			if (!Sipdroid.release) e.printStackTrace();
@@ -187,19 +189,10 @@ public class RtpStreamSender extends Thread {
 			j = lin[i+off];
 			s = 0.03*Math.abs(j) + 0.97*s;
 			if (s < sm) sm = s;
-			if (s > smin) nearend = 3000/5;
+			if (s > smin) nearend = 3000*mu/5;
 			else if (nearend > 0) nearend--;
 		}
-		for (i = 0; i < len; i++) {
-			j = lin[i+off];
-			if (j > 6550)
-				lin[i+off] = 6550*5;
-			else if (j < -6550)
-				lin[i+off] = -6550*5;
-			else
-				lin[i+off] = (short)(j*5);
-		}
-		r = (double)len/100000;
+		r = (double)len/(100000*mu);
 		smin = sm*r + smin*(1-r);
 	}
 
@@ -263,6 +256,7 @@ public class RtpStreamSender extends Thread {
 	}
 	
 	public static int m;
+	int mu = 1;
 	
 	/** Runs it in a new Thread. */
 	public void run() {
@@ -287,14 +281,14 @@ public class RtpStreamSender extends Thread {
 			println("Reading blocks of " + buffer.length + " bytes");
 
 		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-		int mu = 1;
 		int min = AudioRecord.getMinBufferSize(8000,
 				AudioFormat.CHANNEL_CONFIGURATION_MONO,
-				AudioFormat.ENCODING_PCM_16BIT) * (1+mu) / 2;
+				AudioFormat.ENCODING_PCM_16BIT);
+		if (min <= 4096) min *= 3/2;
 		AudioRecord record = new AudioRecord(MediaRecorder.AudioSource.MIC, 8000, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, min);
 		int engineState = record.getState(); 
 		if(engineState == AudioRecord.STATE_UNINITIALIZED) {
-			println("Error initializing audio record engine.");
+			android.util.Log.d("RtpStreamSender", "Error initializing audio record engine.");
 			running = false;
 			changeRecordEngineState(RecordEngineState.STATE_UNINITIALIZED);
 			record = null;
@@ -324,7 +318,7 @@ public class RtpStreamSender extends Thread {
 		while (running) {
 			 if (muted || Receiver.call_state == UserAgent.UA_STATE_HOLD) {
 				 if(Receiver.call_state == UserAgent.UA_STATE_HOLD)
-					 RtpStreamReceiver.restoreMode();
+					 RtpStreamReceiver.restoreMode(false);
 				 record.stop();
 				 while (running && (muted || Receiver.call_state == UserAgent.UA_STATE_HOLD)) {
 					 try {
@@ -396,7 +390,7 @@ public class RtpStreamSender extends Thread {
 			 if (num <= 0)
 				 continue;
 
-			 if (RtpStreamReceiver.getSpeakermode() == AudioManager.MODE_NORMAL) {
+			 if (RtpStreamReceiver.speakermode/*getSpeakermode()*/ == AudioManager.MODE_NORMAL) {
  				 calc(lin,(ring+delay*frame_size)%(frame_size*11),num);
  	 			 if (RtpStreamReceiver.nearend != 0)
 	 				 noise(lin,(ring+delay*frame_size)%(frame_size*11),num,p);
@@ -452,20 +446,12 @@ public class RtpStreamSender extends Thread {
 			 time += frame_size;
  			 m = 1;
 		}
-		/*
-		while (RtpStreamReceiver.getMode() == AudioManager.MODE_IN_CALL)
-			try {
-				sleep(1000);
-			} catch (InterruptedException e) {
-		}	
-		*/
-		if(!Build.MODEL.contains("Samsung") && Integer.parseInt(Build.VERSION.SDK) < 5)
+		if(Integer.parseInt(Build.VERSION.SDK) < 5)
 			while(RtpStreamReceiver.getMode() == AudioManager.MODE_IN_CALL)
 				try {
 					sleep(1000);
 				} catch (InterruptedException e) {
 				}
-		
 		record.stop();
 		record.release();
 		m = 0;

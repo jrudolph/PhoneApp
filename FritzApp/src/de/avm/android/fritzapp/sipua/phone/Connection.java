@@ -23,6 +23,7 @@
 package de.avm.android.fritzapp.sipua.phone;
 
 import de.avm.android.fritzapp.sipua.ui.Receiver;
+import de.avm.android.fritzapp.util.PhoneNumberHelper;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -207,7 +208,7 @@ public class Connection
     
     public void log(long start)
 	{
-	    String number = getAddress();
+	    String number = PhoneNumberHelper.stripNumber(getAddress());
         long duration = (start > 0 ? SystemClock.elapsedRealtime()-start : 0); // start == -1 means the incoming call was picked by another local phone
 	    boolean isPrivateNumber = false; // TODO: need API for isPrivate()
 	
@@ -236,7 +237,9 @@ public class Connection
 	            ci = ((PhoneUtils.CallerInfoToken) o).currentInfo;
 	        }
 	        if (callLogType == CallLog.Calls.MISSED_TYPE)
-	        	Receiver.onText(Receiver.MISSED_CALL_NOTIFICATION, ci != null && ci.name != null?ci.name:number, android.R.drawable.stat_notify_missed_call, 0);
+	        	Receiver.onText(Receiver.MISSED_CALL_NOTIFICATION,
+	        			ci != null && ci.name != null?ci.name:number,
+	        			android.R.drawable.stat_notify_missed_call, 0);
 	        addCall(ci, Receiver.mContext, number, isPrivateNumber,
 	                callLogType, date, (int) duration / 1000);
 	    }

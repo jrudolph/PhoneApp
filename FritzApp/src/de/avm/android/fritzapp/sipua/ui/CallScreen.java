@@ -29,6 +29,7 @@ import android.app.AlertDialog;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.SystemClock;
 import android.text.InputType;
 import android.util.Log;
@@ -73,8 +74,8 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
 		new AlertDialog.Builder(this)
 				.setTitle(Receiver.mContext.getString(R.string.transfer_title))
 				.setView(transferText)
-				.setPositiveButton(android.R.string.ok, this)
-				.setNegativeButton(android.R.string.cancel, this)
+				.setPositiveButton(R.string.ok, this)
+				.setNegativeButton(R.string.cancel, this)
 				.setInverseBackgroundForced(true)
 				.show();
 	}
@@ -100,9 +101,19 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
 	}
 	
 	long enabletime;
-    KeyguardManager mKeyguardManager;
+    KeyguardManager mKeyguardManager = null;
     KeyguardManager.KeyguardLock mKeyguardLock;
     boolean enabled;
+    
+    /* 
+     * if project is targeting SDK>4 remove this and use
+     * Build.VERSION.SDK_INT and Build.VERSION_CODES.ECLAIR
+     */
+    private static final int VERSION_CODE_ECLAIR = 5;
+    private int getBuildVersion()
+    {
+    	return Integer.parseInt(Build.VERSION.SDK);
+    }
     
 	void disableKeyguard() {
 		if (enabled) {
@@ -130,16 +141,32 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
     	if (!Sipdroid.release) Log.i("SipUA:","on start");
     	if (mKeyguardManager == null) {
 	        mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-	        mKeyguardLock = mKeyguardManager.newKeyguardLock("Sipdroid");
+	        mKeyguardLock = mKeyguardManager.newKeyguardLock("FRITZApp");
 	        enabled = true;
     	}
+    	if (getBuildVersion() < VERSION_CODE_ECLAIR) disableKeyguard();
+	}
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+    	if (!Sipdroid.release) Log.i("SipUA:","on resume");
         disableKeyguard();
 	}
 	
 	@Override
-	public void onStop() {
-		super.onStop();
-    	if (!Sipdroid.release) Log.i("SipUA:","on stop");
-		reenableKeyguard();
+	public void onPause()
+	{
+		super.onPause();
+    	if (!Sipdroid.release) Log.i("SipUA:","on pause");
+    	if (getBuildVersion() < VERSION_CODE_ECLAIR) reenableKeyguard();
 	}
+
+ 	@Override
+ 	public void onStop() {
+ 		super.onStop();
+ 	   	if (!Sipdroid.release) Log.i("SipUA:","on stop");
+ 		reenableKeyguard();
+ 	 }
 }

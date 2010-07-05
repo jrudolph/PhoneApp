@@ -214,7 +214,7 @@ public class SettingsRouteExceptionsActivity extends ListActivity
 				return TextDialog.createEdit(this,
 						getString(R.string.settings_addrouteexception), "",
 						InputType.TYPE_CLASS_PHONE)
-						.setPositiveButton(android.R.string.ok,
+						.setPositiveButton(R.string.ok,
 								new DialogInterface.OnClickListener()
 						{
 							public void onClick(DialogInterface dialogInterface, int id)
@@ -227,7 +227,7 @@ public class SettingsRouteExceptionsActivity extends ListActivity
 									mCallRouteExceptions.add(pattern);
 								removeDialog(R.id.Add);
 							}
-						}).setNegativeButton(android.R.string.cancel,
+						}).setNegativeButton(R.string.cancel,
 									new DialogInterface.OnClickListener()
 						{
 							public void onClick(DialogInterface dialogInterface, int id)
@@ -247,7 +247,7 @@ public class SettingsRouteExceptionsActivity extends ListActivity
 						getString(R.string.settings_editrouteexception),
 						mCallRouteExceptions.get(mDialogTargetPosition),
 						InputType.TYPE_CLASS_PHONE)
-						.setPositiveButton(android.R.string.ok,
+						.setPositiveButton(R.string.ok,
 								new DialogInterface.OnClickListener()
 						{
 							public void onClick(DialogInterface dialogInterface, int id)
@@ -268,7 +268,7 @@ public class SettingsRouteExceptionsActivity extends ListActivity
 								}
 								removeDialog(MENU_EDIT);
 							}
-						}).setNegativeButton(android.R.string.cancel,
+						}).setNegativeButton(R.string.cancel,
 								new DialogInterface.OnClickListener()
 						{
 							public void onClick(DialogInterface dialogInterface, int id)

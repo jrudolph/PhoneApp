@@ -42,6 +42,7 @@ import android.net.NetworkInfo.DetailedState;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -130,6 +131,7 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 				switch(call_state)
 				{
 				case UserAgent.UA_STATE_INCOMING_CALL:
+					lock(true);
 					RtpStreamReceiver.good = RtpStreamReceiver.lost = RtpStreamReceiver.loss = RtpStreamReceiver.late = 0;
 					String text = caller.toString();
 					if (text.indexOf("<sip:") >= 0 && text.indexOf("@") >= 0)
@@ -176,11 +178,12 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 					if (wl == null) {
 						PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 						wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
-								PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "Sipdroid");
+								PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "FRITZApp");
 					}
 					wl.acquire();
 					break;
 				case UserAgent.UA_STATE_OUTGOING_CALL:
+					lock(true);
 					RtpStreamReceiver.good = RtpStreamReceiver.lost = RtpStreamReceiver.loss = RtpStreamReceiver.late = 0;
 					onText(MISSED_CALL_NOTIFICATION, null, 0,0);
 					if(!engine(mContext).isRegistered()) // Fix NB
@@ -195,6 +198,7 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 					moveTop();
 					break;
 				case UserAgent.UA_STATE_IDLE:
+					lock(false);
 					broadcastCallStateChanged("IDLE", null);
 					onText(CALL_NOTIFICATION, null, 0,0);
 					ccCall.setState(Call.State.DISCONNECTED);
@@ -207,11 +211,12 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 					engine(mContext).listen();
 					break;
 				case UserAgent.UA_STATE_INCALL:
+					lock(true);
 					broadcastCallStateChanged("OFFHOOK", null);
 					if (ccCall.base == 0) {
 						ccCall.base = SystemClock.elapsedRealtime();
 					}
-					onText(CALL_NOTIFICATION, mContext.getString(R.string.card_title_in_progress), R.drawable.stat_sys_phone_call,ccCall.base);
+					onText(CALL_NOTIFICATION, mContext.getString(R.string.card_title_in_progress), android.R.drawable.stat_sys_phone_call,ccCall.base);
 					ccCall.setState(Call.State.ACTIVE);
 					stopRingtone();
 					if (wl != null && wl.isHeld())
@@ -221,6 +226,7 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 	    				engine(mContext).speaker(AudioManager.MODE_NORMAL);
 					break;
 				case UserAgent.UA_STATE_HOLD:
+					lock(false);
 					onText(CALL_NOTIFICATION, mContext.getString(R.string.card_title_on_hold), android.R.drawable.stat_sys_phone_call_on_hold,ccCall.base);
 					ccCall.setState(Call.State.HOLDING);
 			        mContext.startActivity(createIntent(InCallScreen.class));
@@ -316,6 +322,46 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 		
 		public static void registered() {
 		}
+	    
+		static PowerManager.WakeLock mPartialWakeLock = null;
+		static PowerManager.WakeLock mDimmWakeLock = null;
+
+		static void lock(boolean lock)
+		{
+//			Log.d("Receiver", String.format("lock(%s) - currently %s",
+//					Boolean.toString(lock), (mPartialWakeLock == null) ?
+//					"uninitialized" : Boolean.toString(mPartialWakeLock.isHeld())));
+		
+			if (lock)
+			{
+				if (mPartialWakeLock == null)
+				{
+					PowerManager pm = (PowerManager)mContext
+							.getSystemService(Context.POWER_SERVICE);
+					mPartialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+							"FRITZApp.Receiver");
+
+					// workaround for broken audio output while SCREEN_OFF
+					// possibly a bug on HTC Desire/Google Nexus One
+					// prevent SCREEN_OFF, dimm instead
+					if (Build.MODEL.equals("HTC Desire") ||
+							Build.MODEL.equals("Nexus One") ||
+							Build.MODEL.equals("Archos5"))
+						mDimmWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK |
+								PowerManager.ON_AFTER_RELEASE, "FRITZApp.Receiver");
+				}
+				if (!mPartialWakeLock.isHeld()) mPartialWakeLock.acquire();
+				if ((mDimmWakeLock != null) && !mDimmWakeLock.isHeld())
+					mDimmWakeLock.acquire();
+			}
+			else
+			{
+				if ((mPartialWakeLock != null) && mPartialWakeLock.isHeld())
+					mPartialWakeLock.release();
+				if ((mDimmWakeLock != null) && mDimmWakeLock.isHeld())
+					mDimmWakeLock.release();
+			}
+		}
 		
 		static boolean was_playing;
 		
@@ -390,7 +436,7 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 		}
 		
 		public static void moveTop() {
-			onText(CALL_NOTIFICATION, mContext.getString(R.string.card_title_in_progress), R.drawable.stat_sys_phone_call, 0);
+			onText(CALL_NOTIFICATION, mContext.getString(R.string.card_title_in_progress), android.R.drawable.stat_sys_phone_call, 0);
 			mContext.startActivity(createIntent(Activity2.class)); 
 		}
 
@@ -428,6 +474,13 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
         	return false;
 		}
 		
+		public static int speakermode() {
+			if(docked > 0 && headset <= 0)
+				return AudioManager.MODE_NORMAL;
+			else
+				return AudioManager.MODE_IN_CALL;
+		}
+		
 	    @Override
 		public void onReceive(Context context, Intent intent) {
 	        String intentAction = intent.getAction();
@@ -445,6 +498,7 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 	        } else
 	        if (intentAction.equals(ACTION_PHONE_STATE_CHANGED) &&
 	        		!intent.getBooleanExtra(context.getString(R.string.app_name),false)) {
+	        	stopRingtone();
 	    		pstn_state = intent.getStringExtra("state");
 	    		pstn_time = SystemClock.elapsedRealtime();
 	    		if (pstn_state.equals("IDLE") && call_state != UserAgent.UA_STATE_IDLE)
@@ -456,13 +510,12 @@ import de.avm.android.fritzapp.sipua.phone.Connection;
 	        if (intentAction.equals(ACTION_DOCK_EVENT)) {
 	        	docked = intent.getIntExtra(EXTRA_DOCK_STATE, -1);
 	        	if (call_state == UserAgent.UA_STATE_INCALL)
-	        		if (docked > 0)
-	    				engine(mContext).speaker(AudioManager.MODE_NORMAL);
-	        		else
-	        			engine(mContext).speaker(AudioManager.MODE_IN_CALL);
+	        		engine(mContext).speaker(speakermode());
 	        } else
 		    if (intentAction.equals(Intent.ACTION_HEADSET_PLUG)) {
 		        	headset = intent.getIntExtra("state", -1);
+		        	if(call_state == UserAgent.UA_STATE_INCALL)
+		        		engine(mContext).speaker(speakermode());
 	        }
 		}
 

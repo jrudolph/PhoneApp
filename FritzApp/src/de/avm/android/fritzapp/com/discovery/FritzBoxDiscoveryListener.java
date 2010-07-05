@@ -61,6 +61,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import de.avm.android.fritzapp.util.InetAddressHelper;
+
 
 /**
  * This class can be used to listen for UPNP devices responses when a search message is sent by a control point
@@ -208,10 +210,10 @@ public class FritzBoxDiscoveryListener implements Runnable {
     }
 
     skt = new java.net.MulticastSocket( null );
-    skt.bind( new InetSocketAddress( InetAddress.getByName( "0.0.0.0" ), bindPort ) );
+    skt.bind( new InetSocketAddress( InetAddressHelper.getByName( "0.0.0.0" ), bindPort ) );
     skt.setTimeToLive( FritzBoxDiscovery.DEFAULT_TTL );
     skt.setSoTimeout( DEFAULT_TIMEOUT );
-    skt.joinGroup( InetAddress.getByName( FritzBoxDiscovery.SSDP_IP ) );
+    skt.joinGroup( InetAddressHelper.getByName( FritzBoxDiscovery.SSDP_IP ) );
 
     byte[] buf = new byte[2048];
     input = new DatagramPacket( buf, buf.length );
@@ -274,7 +276,7 @@ public class FritzBoxDiscoveryListener implements Runnable {
       }
       URL loc = new URL( deviceDescrLoc );
       if ( MATCH_IP ) {
-        InetAddress locHost = InetAddress.getByName( loc.getHost() );
+        InetAddress locHost = InetAddressHelper.getByName( loc.getHost() );
         if ( !from.equals( locHost ) ) {
         	//TODO  log.warn( "Discovery message sender IP " + from +
             //       " does not match device description IP " + locHost + 

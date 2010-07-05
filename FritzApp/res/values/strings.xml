@@ -95,6 +95,8 @@
 	<string name="settings_addrouteexception">Ausnahme hinzufügen</string>
 	<string name="settings_editrouteexception">Ausnahme ändern</string>
 	<string name="settings_removerouteexception">Ausnahme entfernen</string>
+	<string name="settings_clir">Rufnummer unterdrückt</string>
+	<string name="settings_clir2">Eigene Rufnummer unterdrücken bei Gesprächen über die FRITZ!Box</string>
     
 	<string name="menu_mute">Stumm</string>
 	<string name="menu_hold">Halten</string>
@@ -103,7 +105,11 @@
 	<string name="menu_exit">Beenden</string>
 	<string name="menu_about">Info</string>
 	<string name="menu_help">Hilfe</string>
-	<string name="menu_call">Anrufen</string>
+	<string name="menu_clir_on">Rufnummer unterdrücken</string>
+	<string name="menu_clir_off">  Rufnummer übermitteln  </string>
+	
+	<string name="hint_clir_on_once">Rufnummer einmalig unterdrücken</string>
+	<string name="hint_clir_off_once">Rufnummer einmalig übermitteln</string>
 
 	<string name="card_title_in_progress">Aktiver Anruf</string>
 	<string name="card_title_on_hold">Gehalten</string>
@@ -131,6 +137,8 @@
 	<string name="callroute_fallback">%s\n\nSoll das Gespräch über das Mobilnetz aufgebaut werden?</string>
 	<string name="yes">Ja</string>
 	<string name="no">Nein</string>
+	<string name="ok">OK</string>
+	<string name="cancel">Abbrechen</string>
 
 	<string name="callroute_dialogtitle">Ausgehende Gespräche</string>
     <string-array name="callroute_optiontitles">
